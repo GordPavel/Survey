@@ -24,7 +24,7 @@ import java.util.List;
 public class ClientController{
 
     @Autowired
-    private SurveyService surveyService;
+    private SurveyService             surveyService;
     @Autowired
     private UserService               userService;
     @Autowired
@@ -40,13 +40,13 @@ public class ClientController{
         return surveys;
     }
 
-    @RequestMapping( value = "/surveyId={id}", method = RequestMethod.GET )
-    public Survey getSurveyById( @PathVariable Integer id ){
+    @RequestMapping( value = "/survey", method = RequestMethod.GET )
+    public Survey getSurveyById( @RequestParam Integer id ){
         return surveyService.getSurveyById( id ).orElseThrow( () -> new SurveyNotFoundException( id ) );
     }
 
-    @RequestMapping( value = "/userLogin={login}", method = RequestMethod.GET )
-    public User getUserByLogin( @PathVariable String login ){
+    @RequestMapping( value = "/user", method = RequestMethod.GET )
+    public User getUserByLogin( @RequestParam String login ){
         return userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ) );
     }
 
@@ -59,13 +59,13 @@ public class ClientController{
             return false;
     }
 
-    @RequestMapping( value = "/survey/userLogin={login}", method = RequestMethod.GET )
-    public List<Survey> getListSurveyByUserMadeLogin( @PathVariable String login ){
-        return getUserByLogin( login ).getMadeSurveys();
+    @RequestMapping( value = "/survey", method = RequestMethod.GET )
+    public List<Survey> getListSurveyByUserMadeLogin( @RequestParam String userMadeLogin ){
+        return getUserByLogin( userMadeLogin ).getMadeSurveys();
     }
 
-    @RequestMapping( value = "/img={id}", method = RequestMethod.GET )
-    public ResponseEntity<byte[]> getImage( @PathVariable String id ){
+    @RequestMapping( value = "/img", method = RequestMethod.GET )
+    public ResponseEntity<byte[]> getImage( @RequestParam String id ){
         try{
             MyFile            file    = filesManager.getFile( id );
             final HttpHeaders headers = new HttpHeaders();

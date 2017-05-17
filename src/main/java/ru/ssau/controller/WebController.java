@@ -6,7 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.ssau.domain.User;
 import ru.ssau.service.UserService;
 import ru.ssau.service.validation.UserRegistrationValidator;
@@ -46,6 +49,20 @@ public class WebController{
         return "login";
     }
 
+    @RequestMapping( value = "/user", method = RequestMethod.GET )
+    public String getUserByLogin( @RequestParam String login, Model model ){
+        model.addAttribute( "user", clientController.getUserByLogin( login ) );
+        // TODO: 17.05.17 Страница пользователя
+        return "user";
+    }
+
+    @RequestMapping( value = "/survey", method = RequestMethod.GET )
+    public String survey( @RequestParam Integer id, Model model ){
+        model.addAttribute( "survey", clientController.getSurveyById( id ) );
+        // TODO: 17.05.17 Страница анкеты
+        return "survey";
+    }
+
     @RequestMapping( value = "/registration", method = RequestMethod.GET )
     public String registration( Model model ){
         model.addAttribute( "userForm", new User() );
@@ -61,8 +78,8 @@ public class WebController{
         return "redirect:/";
     }
 
-    @RequestMapping( value = "/img={id}", method = RequestMethod.GET )
-    public ResponseEntity<byte[]> getImage( @PathVariable String id ) throws IOException{
+    @RequestMapping( value = "/img", method = RequestMethod.GET )
+    public ResponseEntity<byte[]> getImage( @RequestParam String id ) throws IOException{
         return clientController.getImage( id );
     }
 }
