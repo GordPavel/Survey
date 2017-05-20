@@ -28,8 +28,6 @@
         </div>
     </div>
 </div>
-<div class="footer">
-    <footer>Разработчики этого проекта</footer>
-</div>
+<c:import url="footer.jsp"/>
 </body>
 </html>

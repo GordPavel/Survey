@@ -45,6 +45,11 @@ public class ClientController{
         return surveyService.getSurveyById( id ).orElseThrow( () -> new SurveyNotFoundException( id ) );
     }
 
+    @RequestMapping( value = "/user/surveys", method = RequestMethod.GET )
+    public List<Survey> getListSurveyByUserMadeLogin( @RequestParam String userLogin ){
+        return getUserByLogin( userLogin ).getMadeSurveys();
+    }
+
     @RequestMapping( value = "/user", method = RequestMethod.GET )
     public User getUserByLogin( @RequestParam String login ){
         return userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ) );
@@ -57,11 +62,6 @@ public class ClientController{
             return true;
         }else
             return false;
-    }
-
-    @RequestMapping( value = "/survey", method = RequestMethod.GET )
-    public List<Survey> getListSurveyByUserMadeLogin( @RequestParam String userMadeLogin ){
-        return getUserByLogin( userMadeLogin ).getMadeSurveys();
     }
 
     @RequestMapping( value = "/img", method = RequestMethod.GET )

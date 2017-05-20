@@ -9,34 +9,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-
-    <title>Spring Security</title>
-    <!-- Bootstrap core CSS -->
-    <link href="<c:url value="/pages/css/bootstrap.css" />" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="<c:url value="/pages/css/signin.css" />" rel="stylesheet">
+    <title>Вход в личный кабинет</title>
+    <link href="<c:url value="/pages/css/fonts.css" />" rel="stylesheet">
+    <link href="<c:url value="/pages/css/style.css" />" rel="stylesheet">
+    <link href="<c:url value="/pages/libs/bootstrap/bootstrap.css" />" rel="stylesheet">
 </head>
-
 <body>
-
-<div class="error" style="width: 300px;">
-    <c:if test="${not empty error}">
-        <div class="error">${error}</div>
-    </c:if>
-    <c:if test="${not empty msg}">
-        <div class="msg">${msg}</div>
-    </c:if>
-    <c:url value="/login" var="loginUrl"/>
-    <form action="${loginUrl}" method="post">
-        <h2 class="form-signin-heading">Please sign in</h2>
-        <input type="text" class="form-control" name="login" placeholder="Email address" required autofocus
-               value="admin">
-        <input type="password" class="form-control" name="password" placeholder="Password" required value="1234">
-        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
+<c:import url="header.jsp"/>
+<div class="content-bg">
+    <h2>Вход в личный кабинет</h2>
+    <form action="<c:url value="/login"/>" class='send' method="post">
+        <c:if test="${not empty error}">
+            <div class="error">${error}</div>
+        </c:if>
+        <c:if test="${not empty msg}">
+            <div class="msg">${msg}</div>
+        </c:if>
+        <div class="fieldset">
+            <label>Логин</label>
+            <input type='text' name='login' placeholder='Логин' required autofocus
+                   value="admin"><span></span>
+            <br>
+            <label>Пароль</label>
+            <input type='password' name='password' placeholder='Пароль' required value="1234"><span></span>
+            <br>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </div>
+        <div class="sum">
+            <input type="submit" value="Войти"/>
+            <input type="submit" value="Отмена"/>
+        </div>
     </form>
 </div>
-
+<c:import url="footer.jsp"/>
 </body>
 </html>
