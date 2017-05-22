@@ -1,19 +1,17 @@
 package ru.ssau.domain;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 
 public class User{
 
-    private String        login;
-    private String        password;
-    private String        name;
-    private String        lastName;
-    private UserRoles     role;
-    private List<Survey>  doneSurveys;
-    private List<Survey>  madeSurveys;
-    private MultipartFile file;
+    private String       login;
+    private String       password;
+    private String       name;
+    private String       lastName;
+    private UserRoles    role;
+    private List<Survey> doneSurveys;
+    private List<Survey> madeSurveys;
+    private String       fileLocation;
 
     public User(){
     }
@@ -23,18 +21,26 @@ public class User{
         role = UserRoles.USER;
     }
 
-    public User( String login, String password, MultipartFile file ){
+    public User( String login, String password, String fileLocation ){
         this.login = login;
         this.password = password;
-        this.file = file;
+        this.fileLocation = fileLocation;
     }
 
-    public MultipartFile getFile(){
-        return file;
+    public User( String login, String password, String name, String lastName, UserRoles role ){
+        this.login = login;
+        this.password = password;
+        this.name = name;
+        this.lastName = lastName;
+        this.role = role;
     }
 
-    public void setFile( MultipartFile file ){
-        this.file = file;
+    public String getFileLocation(){
+        return fileLocation;
+    }
+
+    public void setFileLocation( String fileLocation ){
+        this.fileLocation = fileLocation;
     }
 
     public List<Survey> getDoneSurveys(){

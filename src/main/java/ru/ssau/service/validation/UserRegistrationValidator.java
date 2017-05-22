@@ -6,6 +6,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 import ru.ssau.domain.User;
+import ru.ssau.domain.UserRegistrationForm;
 import ru.ssau.service.UserService;
 
 import java.util.Optional;
@@ -21,7 +22,6 @@ public class UserRegistrationValidator implements Validator{
         return User.class.equals( aClass );
     }
 
-    //    Для веб формы
     @Override
     public void validate( Object o, Errors errors ){
         User user = ( User ) o;
@@ -39,7 +39,7 @@ public class UserRegistrationValidator implements Validator{
     }
 
     //    Для клиентской формы
-    public boolean validate( User user ){
+    public boolean validate( UserRegistrationForm userRegistrationForm ){
         // TODO: 02.04.17 Валидация
         return true;
     }

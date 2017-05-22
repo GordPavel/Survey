@@ -1,6 +1,7 @@
 <%@ page session="false" isELIgnored="false" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
     <meta charset="utf-8">
@@ -11,35 +12,64 @@
     <title>Registration</title>
 </head>
 <body>
-<div class="container">
 
-    <form:form method="POST" modelAttribute="userForm" class="form-signin" enctype="multipart/form-data">
-        <h2 class="form-signin-heading">Create your account</h2>
+<c:import url="header.jsp"/>
 
-        <spring:bind path="login">
-            <div class="form-group ${status.error ? 'has-error' : ''}">
-                <form:input type="text" path="login" class="form-control" placeholder="login"
-                            autofocus="true"/>
-                <form:errors path="login"/>
-            </div>
-        </spring:bind>
+<div class="content-bg">
 
-        <spring:bind path="password">
-            <div class="form-group ${status.error ? 'has-error' : ''}">
-                <form:input type="password" path="password" class="form-control" placeholder="Password"/>
-                <form:errors path="password"/>
-            </div>
-        </spring:bind>
-
-        <spring:bind path="file">
-            <div>
-                <form:input type="file" path="file"/>
-            </div>
-        </spring:bind>
-
-        <button class="btn" type="submit">Submit</button>
+    <h2>Регистрация пользователя</h2>
+    <form:form modelAttribute="userForm" enctype="multipart/form-data" class='send' method="post">
+        <div class="fieldset">
+            <label>Имя</label>
+            <form:input type="text" path="name" class="form-control" placeholder="Name"/><span></span>
+            <br>
+            <label>Фамилия</label>
+            <form:input type="text" path="lastName" class="form-control" placeholder="Last Name"/><span></span>
+            <br>
+            <label>Логин</label>
+            <spring:bind path="login">
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                    <form:input type="text" path="login" class="form-control" placeholder="login" required
+                                autofocus="true"/><span></span>
+                    <form:errors path="login"/>
+                </div>
+            </spring:bind>
+            <br>
+        </div>
+        <div class='fieldset'>
+            <label>Пароль</label>
+            <spring:bind path="password">
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                    <form:input type="password" path="password" class="form-control" required
+                                placeholder="Password"/><span></span>
+                    <form:errors path="password"/>
+                </div>
+            </spring:bind>
+            <br>
+            <label>Повторите пароль</label>
+            <spring:bind path="passwordRepeat">
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                    <form:input type="password" path="passwordRepeat" class="form-control"
+                                placeholder="Repeat password"/><span></span>
+                    <form:errors path="passwordRepeat"/>
+                </div>
+            </spring:bind>
+            <br>
+            <label>Фотография</label>
+            <spring:bind path="file">
+                <div>
+                    <form:input type="file" class="form-control" path="file"/><span></span>
+                    <form:errors path="passwordRepeat"/>
+                </div>
+            </spring:bind>
+        </div>
+        <div class="sum">
+            <input type="submit" value="Зарегистрироваться">
+            <input href="<c:url value="/"/>" value="Отмена">
+            <input type="reset" value="Очистить">
+        </div>
     </form:form>
-
 </div>
+<c:import url="footer.jsp"/>
 </body>
 </html>

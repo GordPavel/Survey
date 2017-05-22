@@ -25,11 +25,12 @@
     </div>
     <div class="reg">
         <sec:authorize access="!isAuthenticated()">
-            <a class="button" href="<c:url value="/login" />">Войти</a><a>/</a></a><a class="button" href="<c:url
-                value="/registration"/>" role="button">Регистрация</a>
+            <a class="button" href="<c:url value="/login" />">Войти</a>
+            <a>/</a>
+            </a><a class="button" href="<c:url value="/registration"/>" role="button">Регистрация</a>
         </sec:authorize>
         <sec:authorize access="isAuthenticated()">
-            <p><a class="btn btn-lg btn-danger" href="<c:url value="/logout" />" role="button">Выйти</a></p>
+            <p><a class="button" href="<c:url value="/logout"/>" role="button">Выйти</a></p>
         </sec:authorize>
     </div>
 </div>

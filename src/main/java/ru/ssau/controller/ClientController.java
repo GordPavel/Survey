@@ -4,20 +4,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
+import ru.ssau.domain.UserRegistrationForm;
 import ru.ssau.exceptions.SurveyNotFoundException;
 import ru.ssau.service.SurveyService;
 import ru.ssau.service.UserService;
 import ru.ssau.service.filesmanager.FilesManager;
 import ru.ssau.service.filesmanager.MyFile;
 import ru.ssau.service.validation.UserRegistrationValidator;
+import ru.ssau.transport.SurveyTransport;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping( value = "/client" )
@@ -31,13 +35,14 @@ public class ClientController{
     private FilesManager              filesManager;
     @Autowired
     private UserRegistrationValidator validator;
+    @Autowired
+    private ShaPasswordEncoder        passwordEncoder;
 
 
-    @RequestMapping( value = "/topSurveys", method = RequestMethod.GET )
-    public List<Survey> topSurveys(){
-        List<Survey> surveys = surveyService.getTop();
-        surveys.sort( Comparator.comparingInt( Survey::getUsersDone ) );
-        return surveys;
+    @RequestMapping( value = "/topSurveys", method = RequestMethod.GET, headers = "Accept=application/json" )
+    public List<SurveyTransport> topSurveys(){
+        return surveyService.getTop().stream().map(
+                survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect( Collectors.toList() );
     }
 
     @RequestMapping( value = "/survey", method = RequestMethod.GET )
@@ -55,8 +60,20 @@ public class ClientController{
         return userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ) );
     }
 
+    @RequestMapping( value = "/login", method = RequestMethod.POST )
+    public String login( @RequestParam( defaultValue = "" ) String login,
+                         @RequestParam( defaultValue = "" ) String password ){
+        Optional<User> userOptional = userService.getUser( login );
+        if( ! userOptional.isPresent() )
+            return "пошелнахуй";
+        User user = userOptional.get();
+        if( ! user.getPassword().equals( passwordEncoder.encodePassword( password , null ) ) )
+            return "опятьпошелнахуй";
+        return "добропожаловать,уебок";
+    }
+
     @RequestMapping( value = "/registration", method = RequestMethod.POST )
-    public boolean newUser( @ModelAttribute( "user" ) User user ){
+    public boolean newUser( @ModelAttribute( "user" ) UserRegistrationForm user ){
         if( validator.validate( user ) ){
             userService.saveUser( user );
             return true;

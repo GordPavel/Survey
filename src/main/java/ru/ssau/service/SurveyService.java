@@ -1,5 +1,6 @@
 package ru.ssau.service;
 
+import ru.ssau.domain.Category;
 import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
 
@@ -13,4 +14,8 @@ public interface SurveyService{
     Optional<Survey> getSurveyById( Integer id );
 
     Optional<User> getMadeUser( Integer id );
+
+    Optional<Category> getCategoryByName( String name );
+
+    List<Category> getCategories();
 }

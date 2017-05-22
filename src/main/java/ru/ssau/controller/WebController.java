@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.ssau.domain.User;
+import ru.ssau.domain.UserRegistrationForm;
+import ru.ssau.service.SurveyService;
 import ru.ssau.service.UserService;
 import ru.ssau.service.validation.UserRegistrationValidator;
 
@@ -30,11 +31,13 @@ public class WebController{
     private MessageSource             messageSource;
     @Autowired
     private ClientController          clientController;
+    @Autowired
+    private SurveyService             surveyService;
+
 
     @RequestMapping( method = RequestMethod.GET )
     public String start( Model model ){
-        model.addAttribute( "surveys",
-                            clientController.topSurveys().stream().limit( 5 ).collect( Collectors.toList() ) );
+        model.addAttribute( "surveys", surveyService.getTop().stream().limit( 5 ).collect( Collectors.toList() ) );
         return "index";
     }
 
@@ -65,12 +68,13 @@ public class WebController{
 
     @RequestMapping( value = "/registration", method = RequestMethod.GET )
     public String registration( Model model ){
-        model.addAttribute( "userForm", new User() );
+        model.addAttribute( "userForm", new UserRegistrationForm() );
         return "registration";
     }
 
     @RequestMapping( value = "/registration", method = RequestMethod.POST )
-    public String registration( @ModelAttribute( "userForm" ) User userForm, BindingResult bindingResult ){
+    public String registration( @ModelAttribute( "userForm" ) UserRegistrationForm userForm,
+                                BindingResult bindingResult ){
         validator.validate( userForm, bindingResult );
         if( bindingResult.hasErrors() )
             return "registration";
