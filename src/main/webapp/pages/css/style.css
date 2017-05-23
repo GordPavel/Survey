@@ -1,306 +1,299 @@
 @charset "utf-8";
-@import url(css/reset.css);
+* {
+    margin: 0;
+    padding: 5px;
+    outline: none;
+}
 
-@media (min-width: 768px) and (max-width: 979px);
+html {
+    height: 100%
+}
 
-    * {
-        margin: 0;
-        padding: 0;
-        outline: none;
-    }
+body {
+    width: 100%;
+    height: 100%;
+    font-size: 108%;
+    line-height: 187%;
+    background-image: url(../images/bg.png);
+    background-size: cover;
+}
 
-    html {
-        height: 100%
-    }
+.header {
+    background-size: cover;
+    height: 18%;
+    width: 100%;
+    position: relative;
+}
 
-    body {
-        width: 100%;
-        height: 100%;
-        font-family: "Sego UI" sans-serif;
-        font-size: 108%;
-        line-height: 187%;
-        background-image: url(../images/bg.png);
-        background-size: cover;
-    }
+.menu {
+    position: absolute;
+    width: 90%;
+    height: 20%;
+    background: url(../images/logo.png) no-repeat, url(../images/head.png);
+    border-radius: 30px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+    padding: 1.7% 1.9% 1.1% 2.5%;
+    margin-top: 3.32%;
+    margin-left: 3.2%;
+}
 
-    .header {
+.menu ul {
+    margin-left: 20%;
+    /*        расположение главной тем и о нас ;    */
+}
 
-        background-size: cover;
-        height: 60px;
-        width: 100%;
-        position: relative;
+.menu ul li {
+    display: inline-block;
+    padding: 1% 6% 1% 6%;
+    margin-top: -2%;
+}
 
-    }
+.menu ul li a { /*сделать растягивание (когда окно становится меньше - шапка плывет*/
 
-    .menu {
-        width: 90%;
-        height: 61%;
-        position: absolute;
-        background: url(../images/logo.png) repeat-y, url(../images/head.png);
-        border-radius: 30px;
-        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
-        padding: 1.7% 1.9% 1.1% 2.5%;
-        margin-top: 3.32%;
-        margin-left: 3.2%;
-    }
+    font-weight: bold;
+    font-size: 180%;
+    color: darkred;
+    text-shadow: 0 2% 0 #fffbfb;
+    cursor: pointer;
+}
 
-    .menu ul {
-        margin-left: 20%;
-        /*        расположение главной тем и о нас ;    */
-    }
+.menu ul li a:hover { /*выделение заголовков*/
 
-    .menu ul li {
-        display: inline-block;
-        padding: 1% 6% 1% 6%;
-        margin-top: -2%;
-    }
+    background: rgba(245, 203, 125, 0.65);
+    padding: 1% 6% 1% 6%;
+    border-radius: 11px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
 
-    .menu ul li a { /*сделать растягивание (когда окно становится меньше - шапка плывет*/
+}
 
-        font-weight: bold;
-        font-size: 180%;
-        color: darkred;
-        text-shadow: 0 2% 0 #fffbfb;
-        cursor: pointer;
-    }
+.menu ul li.active { /*выделение - на какой вкладке*/
 
-    .menu ul li a:hover { /*выделение заголовков*/
+    font-weight: bold;
+    padding: 1.5% 4% 1.5% 4%;
+    margin-top: -2.34%;
+    background: rgba(245, 203, 125, 0.65);
+    color: darkred;
+    border-radius: 11px;
+    text-decoration: none;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+    font-size: 180%;
+    text-shadow: 0 2% 0 #fffbfb;
+    cursor: pointer;
+}
 
-        background: rgba(245, 203, 125, 0.65);
-        padding: 1% 6% 1% 6%;
-        border-radius: 11px;
-        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+.search {
+    float: right;
+    position: relative;
+    margin-right: 9%;
+    margin-top: 4%; /*сдвиг поля по у + поле*/
+}
 
-    }
+img { /*картинка с лупой*/
+    position: absolute;
+    left: 80%;
+    top: 20%
+}
 
-    .menu ul li.active { /*выделение - на какой вкладке*/
+.search form input {
 
-        font-weight: bold;
-        padding: 1.5% 4% 1.5% 4%;
-        margin-top: -2.34%;
-        background: rgba(245, 203, 125, 0.65);
-        color: darkred;
-        border-radius: 11px;
-        text-decoration: none;
-        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
-        font-size: 180%;
-        text-shadow: 0 2% 0 #fffbfb;
-        cursor: pointer;
-    }
+    padding: 4px 32px 4px 15px;
+    width: 170px;
+    /*длина поля ввода
+   /*  margin-left: 0%; сдвиг поля влево
+   /*    margin-right: 30%; */
+    height: 30px; /*ширина поля для текта*/
+    background: rgba(250, 250, 250, 0.99);
+    border-radius: 5px;
+    border: 0;
+    outline: 0;
+    color: darkred;
+    font-weight: 600; /*жирный текст*/
+    font-style: normal;
+    box-shadow: 1px 1px 0px #712407, 0px 0px 8px rgba(0, 0, 0, 0.41) inset;
+}
 
-    .search {
-        float: right;
-        position: relative;
-        margin-right: 9%;
-        margin-top: 4%; /*сдвиг поля по у + поле*/
-    }
+.reg form {
+    position: relative;
+    float: left;
+    padding: 1% 5% 1% 5%;
+}
 
-    img { /*картинка с лупой*/
-        position: absolute;
-        left: 80%;
-        top: 20%
-    }
+.reg form a {
+    color: white;
+}
 
-    .search form input {
+.button {
+    color: white;
+}
 
-        padding: 4px 32px 4px 15px;
-        width: 170px;
-        /*длина поля ввода
-       /*  margin-left: 0%; сдвиг поля влево
-       /*    margin-right: 30%; */
-        height: 30px; /*ширина поля для текта*/
-        background: rgba(250, 250, 250, 0.99);
-        border-radius: 5px;
-        border: 0;
-        outline: 0;
-        color: darkred;
-        font-weight: 600; /*жирный текст*/
-        font-style: normal;
-        box-shadow: 1px 1px 0px #712407, 0px 0px 8px rgba(0, 0, 0, 0.41) inset;
-    }
+.content-bg {
+    width: 65%;
+    height: 106%;
+    margin: 2% 1% 0% 18%; /* Выравнивание по центру */
+    background: rgba(198, 101, 3, 0.67);
+}
 
-    .reg form {
-        position: relative;
-        float: left;
-        padding: 1% 5% 1% 5%;
-    }
+.article p strong { /*заголовки в тексте */
+    color: #fff;
+    font-weight: 600;
+    font-size: 300%;
+    text-shadow: 3px 1px 1px rgb(36, 0, 0);
+    margin-left: 30%;
+}
 
-    .reg form a {
-        color: white;
-    }
+.article h3 {
+    color: aliceblue;
+    font-size: 300%;
+    font-weight: 600;
+    padding: 0% 20% 7% 15%;
+}
 
-    .button {
-        color: white;
-    }
+.article li {
+    list-style-type: none; /* Убираем маркеры */
 
-    .content-bg {
-        width: 65%;
-        height: 106%;
-        margin: 2% 1% 0% 18%; /* Выравнивание по центру */
-        background: rgba(198, 101, 3, 0.67);
-    }
+}
 
-    .article p strong { /*заголовки в тексте */
-        color: #fff;
-        font-weight: 600;
-        font-size: 300%;
-        text-shadow: 3px 1px 1px rgb(36, 0, 0);
-        margin-left: 30%;
-    }
+.article li a {
+    color: darkred;
+    word-spacing: 50%;
+    font-weight: 600; /*жирный текст*/
+    margin-left: 20%;
+    text-decoration: underline;
+    font-size: 200%;
+}
 
-    .article h3 {
-        color: aliceblue;
-        font-size: 300%;
-        font-weight: 650;
-        padding: 0% 20% 7% 15%;
-    }
+.article p {
+    color: #fa8700;
+    font-size: 80%;
+}
 
-    .article li {
-        list-style-type: none; /* Убираем маркеры */
+.article li a:hover {
+    color: #ffffff;
+    text-decoration: none
+}
 
-    }
+.scroll pre {
 
-    .article li a {
-        color: darkred;
-        word-spacing: 50%;
-        font-weight: 600; /*жирный текст*/
-        margin-left: 20%;
-        text-decoration: underline;
-        font-size: 200%;
-    }
+    margin-left: 5%;
+    border-radius: 0 0 3px 3px;
+    max-height: 480px;
+    max-width: 90%;
+    overflow: auto;
+    overflow-x: auto;
+    overflow-y: auto;
+}
 
-    .article p {
-        color: #fa8700;
-        font-size: 80%;
-    }
+pre {
 
-    .article li a:hover {
-        color: #ffffff;
-        text-decoration: none
-    }
+    color: #333;
+    border: 1px solid #e9e8e8;
+    border-radius: 3px;
+    padding: 6px 10px;
+    line-height: 19px;
+    font-size: .94rem;
+}
 
-    .scroll pre {
+table {
+    width: 100%; /* Ширина таблицы */
+    height: 90%;
+    border-color: #ffffff;
 
-        margin-left: 5%;
-        border-radius: 0 0 3px 3px;
-        max-height: 480px;
-        max-width: 90%;
-        overflow: auto;
-        overflow-x: auto;
-        overflow-y: auto;
-    }
+}
 
-    pre {
+th {
+    background: #825a00; /* Цвет фона */
+    color: #fffff0; /* Цвет текста */
+    height: 10%;
+    width: 50%;
+}
 
-        color: #333;
-        border: 1px solid #e9e8e8;
-        border-radius: 3px;
-        padding: 6px 10px;
-        line-height: 19px;
-        font-size: .94rem;
-    }
+td, th {
+    padding: 4px; /* Поля вокруг содержимого ячеек */
+}
 
-    table {
-        width: 100%; /* Ширина таблицы */
-        height: 90%;
-        border-color: #ffffff;
+.footer footer {
+    background: url(../images/head1.png);
+}
 
-    }
+.footer footer p {
+    color: #842100;
+}
 
-    th {
-        background: #825a00; /* Цвет фона */
-        color: #fffff0; /* Цвет текста */
-        height: 10%;
-        width: 50%;
-    }
+h2 {
+    font-size: 30px;
+    margin-left: 40%;
+    margin-bottom: 5%;
+    color: #712407;
+}
 
-    td, th {
-        padding: 4px; /* Поля вокруг содержимого ячеек */
-    }
+.form-horizontal {
+    padding: 5% 10% 5% 35%;
+}
 
-    .footer footer {
-        background: url(../images/head1.png);
-    }
+input {
+    background: rgba(250, 250, 250, 0.99);
+    border-radius: 5px;
+    box-shadow: 1px 1px 0px #712407, 0px 0px 8px rgba(0, 0, 0, 0.41) inset;
+}
 
-    .footer footer p {
-        color: #842100;
-    }
+form img {
 
-    h2 {
-        font-size: 30px;
-        margin-left: 40%;
-        margin-bottom: 5%;
-        color: #712407;
-    }
+    vertical-align: middle;
+}
 
-    .form-horizontal {
-        padding: 5% 10% 5% 35%;
-    }
+.send {
+    border: none;
+    padding: 1% 1% 1% 25%;
+}
 
-    input {
-        background: rgba(250, 250, 250, 0.99);
-        border-radius: 5px;
-        box-shadow: 1px 1px 0px #712407, 0px 0px 8px rgba(0, 0, 0, 0.41) inset;
-    }
+.fieldset {
+    border: none;
+    padding: 0;
+    margin-top: 0%;
+}
 
-    form img {
+label {
+    width: 80px;
+    font-size: 14px;
+    display: inline-block;
+}
 
-        vertical-align: middle;
-    }
+form input {
+    border: 1px solid #C1C1C1;
+    padding: 3px 5px;
+    margin: 7px;
+    font-weight: bolder;
+}
 
-    .send {
-        border: none;
-        padding: 1% 1% 1% 25%;
-    }
+form input:valid + span {
+    content: url(http://htmlbook.ru/example/images/ok.png);
+}
 
-    .fieldset {
-        border: none;
-        padding: 0;
-        margin-top: 0%;
-    }
+form input:invalid + span {
+    content: url(http://www.clker.com/cliparts/4/3/1/f/1195436930767206781not_ok_mark_h_kon_l_vdal_01.svg);
+    height: 15px;
+    vertical-align: middle;
+    margin-left: -3px;
+}
 
-    label {
-        width: 80px;
-        font-size: 14px;
-        display: inline-block;
-    }
+.sum {
 
-    form input {
-        border: 1px solid #C1C1C1;
-        padding: 3px 5px;
-        margin: 7px;
-        font-weight: bolder;
-    }
+    margin-top: 5%;
+    margin-left: 3%;
 
-    form input:valid + span {
-        content: url(http://htmlbook.ru/example/images/ok.png);
-    }
+}
 
-    form input:invalid + span {
-        content: url(http://www.clker.com/cliparts/4/3/1/f/1195436930767206781not_ok_mark_h_kon_l_vdal_01.svg);
-        height: 15px;
-        vertical-align: middle;
-        margin-left: -3px;
-    }
+.sum input {
+    padding: 2px 15px;
+    border-radius: 15px;
+    background: linear-gradient(#e09200, #8f1b00);
+    color: white;
+}
 
-    .sum {
-
-        margin-top: 5%;
-        margin-left: 3%;
-
-    }
-
-    .sum input {
-        padding: 2px 15px;
-        border-radius: 15px;
-        background: linear-gradient(#e09200, #8f1b00);
-        color: white;
-    }
-
-    textarea {
-        max-width: 700px;
-        max-height: 200px;
-    }
+textarea {
+    max-width: 700px;
+    max-height: 200px;
+}
 
 
 

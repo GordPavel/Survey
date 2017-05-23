@@ -1,15 +1,14 @@
 package ru.ssau.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
-import ru.ssau.domain.UserRegistrationForm;
 import ru.ssau.exceptions.SurveyNotFoundException;
 import ru.ssau.service.SurveyService;
 import ru.ssau.service.UserService;
@@ -17,6 +16,7 @@ import ru.ssau.service.filesmanager.FilesManager;
 import ru.ssau.service.filesmanager.MyFile;
 import ru.ssau.service.validation.UserRegistrationValidator;
 import ru.ssau.transport.SurveyTransport;
+import ru.ssau.transport.UserRegistrationForm;
 
 import java.io.IOException;
 import java.util.List;
@@ -61,15 +61,15 @@ public class ClientController{
     }
 
     @RequestMapping( value = "/login", method = RequestMethod.POST )
-    public String login( @RequestParam( defaultValue = "" ) String login,
-                         @RequestParam( defaultValue = "" ) String password ){
+    public ResponseEntity<?> login( @RequestParam( defaultValue = "" ) String login,
+                                    @RequestParam( defaultValue = "" ) String password ){
         Optional<User> userOptional = userService.getUser( login );
-        if( ! userOptional.isPresent() )
-            return "пошелнахуй";
+        if( !userOptional.isPresent() )
+            return ResponseEntity.notFound().build();
         User user = userOptional.get();
-        if( ! user.getPassword().equals( passwordEncoder.encodePassword( password , null ) ) )
-            return "опятьпошелнахуй";
-        return "добропожаловать,уебок";
+        if( !user.getPassword().equals( passwordEncoder.encodePassword( password, null ) ) )
+            return ResponseEntity.badRequest().build();
+        return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body( "welcome" );
     }
 
     @RequestMapping( value = "/registration", method = RequestMethod.POST )
@@ -82,15 +82,13 @@ public class ClientController{
     }
 
     @RequestMapping( value = "/img", method = RequestMethod.GET )
-    public ResponseEntity<byte[]> getImage( @RequestParam String id ){
+    public ResponseEntity<?> getImage( @RequestParam String id ){
         try{
-            MyFile            file    = filesManager.getFile( id );
-            final HttpHeaders headers = new HttpHeaders();
-            headers.setContentType( file.getMediaType() );
-            return new ResponseEntity<>( file.getBytes(), headers, HttpStatus.CREATED );
+            MyFile file = filesManager.getFile( id );
+            return ResponseEntity.status( HttpStatus.CREATED ).body( file.getBytes() );
         }catch( IllegalArgumentException | IOException e ){
             System.out.println( String.format( "Ошибка чтения файла %s%s.jpeg", filesManager.getFilesDir(), id ) );
-            return new ResponseEntity<>( null, null, HttpStatus.NOT_FOUND );
+            return ResponseEntity.notFound().build();
         }
     }
 }

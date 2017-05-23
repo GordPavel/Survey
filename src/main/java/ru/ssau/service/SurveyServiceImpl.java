@@ -6,7 +6,10 @@ import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
 import ru.ssau.exceptions.SurveyNotFoundException;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,19 +27,14 @@ public class SurveyServiceImpl implements SurveyService{
             public Survey apply( Survey t ){
                 return new Survey( ++i );
             }
-        } ).limit( 20 ).collect( Collectors.toMap( Survey::getId, p -> p ) );
+        } ).limit( 20 ).sorted( ( a, b ) -> b.getUsersDone() - a.getId() ).collect(
+                Collectors.toMap( Survey::getId, p -> p ) );
         categoriesMap = new HashMap<>();
-        categoriesMap.put( "category1", new Category( "category1", surveys.values().stream().limit( 5 ).collect(
-                Collectors.toList() ) ) );
-        categoriesMap.put( "category2", new Category( "category2",
-                                                      surveys.values().stream().skip( 5 ).limit( 5 ).collect(
-                                                              Collectors.toList() ) ) );
-        categoriesMap.put( "category3", new Category( "category3",
-                                                      surveys.values().stream().skip( 10 ).limit( 5 ).collect(
-                                                              Collectors.toList() ) ) );
-        categoriesMap.put( "category4", new Category( "category4",
-                                                      surveys.values().stream().skip( 15 ).limit( 5 ).collect(
-                                                              Collectors.toList() ) ) );
+//        Добавление анкет в категории и сортивроке по отвеченным пользователям
+        for( int i = 0, j = 1 ; j <= 4 ; i += 5, j++ )
+            categoriesMap.put( "category" + j, new Category( "category" + j,
+                                                             surveys.values().stream().skip( i ).limit( 5 ).collect(
+                                                                     Collectors.toList() ) ) );
     }
 
     @Override
@@ -54,7 +52,7 @@ public class SurveyServiceImpl implements SurveyService{
 
     @Override
     public List<Survey> getTop(){
-        return surveys.values().stream().sorted( Comparator.comparingInt( Survey::getUsersDone ) ).collect(
+        return surveys.values().stream().sorted( ( a, b ) -> b.getUsersDone() - a.getUsersDone() ).collect(
                 Collectors.toList() );
     }
 
@@ -62,11 +60,37 @@ public class SurveyServiceImpl implements SurveyService{
     public Optional<Category> getCategoryByName( String name ){
         if( !categoriesMap.containsKey( name ) )
             return Optional.empty();
+        categoriesMap.get( name ).getSurveys().sort( ( a, b ) -> b.getUsersDone() - a.getUsersDone() );
         return Optional.of( categoriesMap.get( name ) );
     }
 
     @Override
     public List<Category> getCategories(){
-        return categoriesMap.values().stream().collect( Collectors.toList() );
+//        сначала преобразуем в лист RatingTopics, чтобы можно было сортировать по отвеченным пользователям,
+//        затем снова преобразуем в лист Category, сортируем внутри каждой категории все анкеты и собираем в лист
+        return categoriesMap.values().stream()
+                .map( category -> new RatingTopics( category.getSurveys().stream()
+                                                            .mapToInt( Survey::getUsersDone )
+                                                            .reduce( ( a, b ) -> a + b ).getAsInt(),
+                                                            category ) )
+                .sorted( ( a, b ) -> Integer.compare( b.getUsersDone() , a.getUsersDone() ) )
+                .map( ratingTopics -> ratingTopics.category )
+                .peek( category ->
+                               category.getSurveys().sort( ( a, b ) -> Integer.compare( b.getUsersDone() , a.getUsersDone() )  ) )
+                .collect( Collectors.toList() );
+    }
+
+    class RatingTopics{
+        Integer  usersDone;
+        Category category;
+
+        RatingTopics( Integer usersDone, Category category ){
+            this.usersDone = usersDone;
+            this.category = category;
+        }
+
+        Integer getUsersDone(){
+            return usersDone;
+        }
     }
 }

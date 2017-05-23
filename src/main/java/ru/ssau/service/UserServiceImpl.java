@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.ssau.domain.User;
-import ru.ssau.domain.UserRegistrationForm;
+import ru.ssau.transport.UserRegistrationForm;
 import ru.ssau.domain.UserRoles;
 import ru.ssau.service.filesmanager.FilesManager;
 
@@ -55,14 +55,17 @@ public class UserServiceImpl implements UserService{
         user.setLastName( userRegistrationForm.getLastName() );
         user.setPassword( passwordEncoder.encodePassword( userRegistrationForm.getPassword(), null ) );
         user.setRole( UserRoles.USER );
-        user.setFileLocation( userRegistrationForm.getName() );
-        try{
-            filesManager.saveFile( userRegistrationForm.getFile().getBytes(),
-                                   userRegistrationForm.getLogin() + ".jpeg" );
-        }catch( IOException e ){
-            System.out.println( String.format( "Ошибка записи файла %s%s.jpeg", filesManager.getFilesDir(),
-                                               userRegistrationForm.getLogin() ) );
-            e.printStackTrace();
+        if( !userRegistrationForm.getFile().isEmpty() ){
+            user.setFileLocation( userRegistrationForm.getName() );
+            try{
+                filesManager.saveFile( userRegistrationForm.getFile().getBytes(),
+                                       userRegistrationForm.getLogin() + ".jpeg" );
+            }catch( IOException e ){
+                System.out.println( String.format( "Ошибка записи файла %s%s.jpeg", filesManager.getFilesDir(),
+                                                   userRegistrationForm.getLogin() ) );
+                e.printStackTrace();
+            }
         }
+        users.put( user.getLogin(), user );
     }
 }

@@ -1,4 +1,4 @@
-package ru.ssau.domain;
+package ru.ssau.transport;
 
 import org.springframework.web.multipart.MultipartFile;
 

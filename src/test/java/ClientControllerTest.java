@@ -51,14 +51,10 @@ public class ClientControllerTest{
     @Test
     public void newUserWithFile() throws Exception{
         mockMvc.perform(
-
                 fileUpload( "/client/registration" )
-
                         .file( new MockMultipartFile( "file",
                                                       Files.newInputStream( Paths.get( filesDir + "1.jpeg" ) ) ) )
-
                         .param( "login", "anon111" ).param( "password", "1234567890" )
-
         ).andReturn();
         Assert.assertTrue( Files.exists( Paths.get( filesDir + "anon111.jpeg" ) ) );
         Files.delete( Paths.get( filesDir + "anon111.jpeg" ) );

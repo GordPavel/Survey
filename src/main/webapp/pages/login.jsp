@@ -20,14 +20,14 @@
     <h2>Вход в личный кабинет</h2>
     <form action="<c:url value="/login"/>" class='send' method="post">
         <c:if test="${not empty error}">
-            <div class="error">${error}</div>
+            <div style="color: red">${error}</div>
         </c:if>
         <c:if test="${not empty msg}">
             <div class="msg">${msg}</div>
         </c:if>
         <div class="fieldset">
             <label>Логин</label>
-            <input type='text' name='login' placeholder='Логин' required autofocus
+            <input type='text' name='login' placeholder='Логин' <c:if test="${not empty error}">style="color: red" </c:if> required autofocus
                    value="admin"><span></span>
             <br>
             <label>Пароль</label>

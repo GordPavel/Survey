@@ -6,7 +6,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 import ru.ssau.domain.User;
-import ru.ssau.domain.UserRegistrationForm;
+import ru.ssau.transport.UserRegistrationForm;
 import ru.ssau.service.UserService;
 
 import java.util.Optional;
@@ -24,7 +24,7 @@ public class UserRegistrationValidator implements Validator{
 
     @Override
     public void validate( Object o, Errors errors ){
-        User user = ( User ) o;
+        UserRegistrationForm user = ( UserRegistrationForm ) o;
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "login", "NotEmpty" );
         if( user.getLogin().length() < 6 || user.getLogin().length() > 32 )
             errors.rejectValue( "login", "Size.userForm.login" );

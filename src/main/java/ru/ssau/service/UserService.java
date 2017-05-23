@@ -1,7 +1,7 @@
 package ru.ssau.service;
 
 import ru.ssau.domain.User;
-import ru.ssau.domain.UserRegistrationForm;
+import ru.ssau.transport.UserRegistrationForm;
 
 import java.util.List;
 import java.util.Optional;

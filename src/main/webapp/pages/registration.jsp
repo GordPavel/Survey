@@ -10,6 +10,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>Registration</title>
+    <link href="<c:url value="/pages/css/fonts.css" />" rel="stylesheet">
+    <link href="<c:url value="/pages/css/style.css" />" rel="stylesheet">
+    <link href="<c:url value="/pages/libs/bootstrap/bootstrap.css" />" rel="stylesheet">
 </head>
 <body>
 
@@ -29,7 +32,7 @@
             <label>Логин</label>
             <spring:bind path="login">
                 <div class="form-group ${status.error ? 'has-error' : ''}">
-                    <form:input type="text" path="login" class="form-control" placeholder="login" required
+                    <form:input type="text" path="login" class="form-control" placeholder="login"
                                 autofocus="true"/><span></span>
                     <form:errors path="login"/>
                 </div>
@@ -40,7 +43,7 @@
             <label>Пароль</label>
             <spring:bind path="password">
                 <div class="form-group ${status.error ? 'has-error' : ''}">
-                    <form:input type="password" path="password" class="form-control" required
+                    <form:input type="password" path="password" class="form-control"
                                 placeholder="Password"/><span></span>
                     <form:errors path="password"/>
                 </div>
@@ -65,7 +68,7 @@
         </div>
         <div class="sum">
             <input type="submit" value="Зарегистрироваться">
-            <input href="<c:url value="/"/>" value="Отмена">
+            <input type="button" href="<c:url value="/"/>" value="Отмена">
             <input type="reset" value="Очистить">
         </div>
     </form:form>
