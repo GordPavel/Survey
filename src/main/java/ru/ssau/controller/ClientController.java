@@ -1,6 +1,7 @@
 package ru.ssau.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -69,7 +70,7 @@ public class ClientController{
         User user = userOptional.get();
         if( !user.getPassword().equals( passwordEncoder.encodePassword( password, null ) ) )
             return ResponseEntity.badRequest().build();
-        return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body( "welcome" );
+        return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body( user );
     }
 
     @RequestMapping( value = "/registration", method = RequestMethod.POST )
@@ -84,8 +85,10 @@ public class ClientController{
     @RequestMapping( value = "/img", method = RequestMethod.GET )
     public ResponseEntity<?> getImage( @RequestParam String id ){
         try{
-            MyFile file = filesManager.getFile( id );
-            return ResponseEntity.status( HttpStatus.CREATED ).body( file.getBytes() );
+            MyFile            file    = filesManager.getFile( id );
+            final HttpHeaders headers = new HttpHeaders();
+            headers.setContentType( file.getMediaType() );
+            return ResponseEntity.accepted().headers( headers ).body( file.getBytes() );
         }catch( IllegalArgumentException | IOException e ){
             System.out.println( String.format( "Ошибка чтения файла %s%s.jpeg", filesManager.getFilesDir(), id ) );
             return ResponseEntity.notFound().build();

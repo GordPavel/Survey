@@ -11,7 +11,7 @@ public class User{
     private UserRoles    role;
     private List<Survey> doneSurveys;
     private List<Survey> madeSurveys;
-    private String       fileLocation;
+    private String       fileId;
 
     public User(){
     }
@@ -21,10 +21,10 @@ public class User{
         role = UserRoles.USER;
     }
 
-    public User( String login, String password, String fileLocation ){
+    public User( String login, String password, String fileId ){
         this.login = login;
         this.password = password;
-        this.fileLocation = fileLocation;
+        this.fileId = fileId;
     }
 
     public User( String login, String password, String name, String lastName, UserRoles role ){
@@ -35,12 +35,21 @@ public class User{
         this.role = role;
     }
 
-    public String getFileLocation(){
-        return fileLocation;
+    public User( String login, String password, String name, String lastName, UserRoles role , String fileId ){
+        this.login = login;
+        this.password = password;
+        this.name = name;
+        this.lastName = lastName;
+        this.role = role;
+        this.fileId = fileId;
     }
 
-    public void setFileLocation( String fileLocation ){
-        this.fileLocation = fileLocation;
+    public String getFileId(){
+        return fileId;
+    }
+
+    public void setFileId( String fileId ){
+        this.fileId = fileId;
     }
 
     public List<Survey> getDoneSurveys(){

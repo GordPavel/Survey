@@ -39,6 +39,11 @@ public class WebController{
         return "index";
     }
 
+    @RequestMapping( value = "/info" ,method = RequestMethod.GET )
+    public String info(){
+        return "info";
+    }
+
     @RequestMapping( value = "/login", method = RequestMethod.GET )
     public String signInPage( @RequestParam( value = "error", required = false ) String error,
                               @RequestParam( value = "logout", required = false ) String logout, Model model ){

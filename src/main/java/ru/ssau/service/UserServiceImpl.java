@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.ssau.domain.User;
-import ru.ssau.transport.UserRegistrationForm;
 import ru.ssau.domain.UserRoles;
 import ru.ssau.service.filesmanager.FilesManager;
+import ru.ssau.transport.UserRegistrationForm;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,12 +27,12 @@ public class UserServiceImpl implements UserService{
     private static Map<String, User> users;
 
     static{
+        String adminPasswordHashSha_256 = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+        String userPasswordHashSha_256  = "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb";
+
         users = new HashMap<>();
-        users.put( "admin",
-                   new User( "admin", "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4", "name",
-                             "lastName", UserRoles.ADMIN ) );
-        users.put( "user", new User( "user", "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb", "name",
-                                     "lastName", UserRoles.USER ) );
+        users.put( "admin", new User( "admin", adminPasswordHashSha_256, "name", "lastName", UserRoles.ADMIN, "1" ) );
+        users.put( "user", new User( "user", userPasswordHashSha_256, "name", "lastName", UserRoles.USER ) );
     }
 
     @Override
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService{
         user.setPassword( passwordEncoder.encodePassword( userRegistrationForm.getPassword(), null ) );
         user.setRole( UserRoles.USER );
         if( !userRegistrationForm.getFile().isEmpty() ){
-            user.setFileLocation( userRegistrationForm.getName() );
+            user.setFileId( userRegistrationForm.getName() );
             try{
                 filesManager.saveFile( userRegistrationForm.getFile().getBytes(),
                                        userRegistrationForm.getLogin() + ".jpeg" );
