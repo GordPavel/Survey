@@ -17,7 +17,7 @@ public class FilesManagerImpl implements FilesManager{
 
     // TODO: 02.04.17 Прописать директорию с фалами в properties
 
-    public static String filesDir = "/surveyProjectFiles/";
+    private static String filesDir = "/surveyProjectFiles/";
 
     @Override
     public MyFile getFile( String location ) throws IOException{
@@ -59,13 +59,13 @@ public class FilesManagerImpl implements FilesManager{
     }
 
     private String getFileType( String location ){
-        @SuppressWarnings( "ConstantConditions" ) String fileName = Arrays.stream( new File( filesDir )
+        @SuppressWarnings( "ConstantConditions" ) String fileName =
 
-                                                                                           .listFiles(
-                                                                                                   ( dir, name ) -> name.startsWith(
-                                                                                                           location ) ) ).findFirst()
+                Arrays.stream( new File( filesDir )
 
-                .orElseThrow( () -> new IllegalArgumentException( location ) ).getName();
+                                       .listFiles( ( dir, name ) -> name.startsWith( location ) ) )
+
+                        .findFirst().orElseThrow( () -> new IllegalArgumentException( location ) ).getName();
         return fileName.substring( fileName.indexOf( '.' ) + 1 );
     }
 }

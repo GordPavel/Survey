@@ -6,9 +6,11 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 import ru.ssau.domain.User;
-import ru.ssau.transport.UserRegistrationForm;
 import ru.ssau.service.UserService;
+import ru.ssau.transport.UserRegistrationForm;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Optional;
 
 @Component
@@ -25,9 +27,14 @@ public class UserRegistrationValidator implements Validator{
     @Override
     public void validate( Object o, Errors errors ){
         UserRegistrationForm user = ( UserRegistrationForm ) o;
+
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name", "NotEmpty" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "lastName", "NotEmpty" );
+
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "login", "NotEmpty" );
         if( user.getLogin().length() < 6 || user.getLogin().length() > 32 )
             errors.rejectValue( "login", "Size.userForm.login" );
+
         Optional<User> optional = userService.getUser( user.getLogin() );
         optional.ifPresent( user1 -> errors.rejectValue( "login", "Duplicate.userForm.login" ) );
 
@@ -35,11 +42,18 @@ public class UserRegistrationValidator implements Validator{
         if( user.getPassword().length() < 8 || user.getPassword().length() > 32 )
             errors.rejectValue( "password", "Size.userForm.password" );
 
-        // TODO: 02.04.17 Подтверждение пароля
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "passwordRepeat", "NotEmpty" );
+        if( !user.getPasswordRepeat().equals( user.getPassword() ) )
+            errors.rejectValue( "passwordRepeat", "Diff.userForm.password" );
+
+        if( !user.getFile().isEmpty() )
+            if( !new LinkedList<>(
+                    Arrays.asList( user.getFile().getOriginalFilename().split( "\\." ) ) ).getLast().equals( "jpg" ) )
+                errors.rejectValue( "file", "File.notJPG" );
     }
 
     //    Для клиентской формы
-    public boolean validate( UserRegistrationForm userRegistrationForm ){
+    public boolean validate( UserRegistrationForm userRegistrationForm, Errors errors ){
         // TODO: 02.04.17 Валидация
         return true;
     }

@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService{
         user.setPassword( passwordEncoder.encodePassword( userRegistrationForm.getPassword(), null ) );
         user.setRole( UserRoles.USER );
         if( !userRegistrationForm.getFile().isEmpty() ){
-            user.setFileId( userRegistrationForm.getName() );
+            user.setFileId( userRegistrationForm.getLogin() );
             try{
                 filesManager.saveFile( userRegistrationForm.getFile().getBytes(),
                                        userRegistrationForm.getLogin() + ".jpeg" );

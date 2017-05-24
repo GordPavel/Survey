@@ -25,9 +25,11 @@
         <div class="fieldset">
             <label>Имя</label>
             <form:input type="text" path="name" class="form-control" placeholder="Name"/><span></span>
+            <form:errors path="name"/>
             <br>
             <label>Фамилия</label>
             <form:input type="text" path="lastName" class="form-control" placeholder="Last Name"/><span></span>
+            <form:errors path="lastName"/>
             <br>
             <label>Логин</label>
             <spring:bind path="login">
@@ -62,7 +64,7 @@
             <spring:bind path="file">
                 <div>
                     <form:input type="file" class="form-control" path="file"/><span></span>
-                    <form:errors path="passwordRepeat"/>
+                    <form:errors path="file"/>
                 </div>
             </spring:bind>
         </div>

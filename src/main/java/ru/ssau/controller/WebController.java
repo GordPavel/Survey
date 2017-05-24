@@ -39,7 +39,7 @@ public class WebController{
         return "index";
     }
 
-    @RequestMapping( value = "/info" ,method = RequestMethod.GET )
+    @RequestMapping( value = "/info", method = RequestMethod.GET )
     public String info(){
         return "info";
     }
@@ -73,7 +73,6 @@ public class WebController{
     @RequestMapping( value = "/user", method = RequestMethod.GET )
     public String getUserByLogin( @RequestParam String login, Model model ){
         model.addAttribute( "user", clientController.getUserByLogin( login ) );
-        // TODO: 17.05.17 Страница пользователя
         return "user";
     }
 
