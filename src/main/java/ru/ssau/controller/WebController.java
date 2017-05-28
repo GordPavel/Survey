@@ -74,13 +74,13 @@ public class WebController{
 
     @RequestMapping( value = "/user", method = RequestMethod.GET )
     public String getUserByLogin( @RequestParam String login, Model model ){
-        model.addAttribute( "user", clientController.getUserByLogin( login ) );
+        model.addAttribute( "user", userService.getUser( login ) );
         return "user";
     }
 
     @RequestMapping( value = "/survey", method = RequestMethod.GET )
     public String survey( @RequestParam Integer id, Model model ){
-        model.addAttribute( "survey", clientController.getSurveyById( id ) );
+        model.addAttribute( "survey", surveyService.getSurveyById( id ) );
         // TODO: 17.05.17 Страница анкеты
         return "survey";
     }

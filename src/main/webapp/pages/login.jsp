@@ -17,7 +17,7 @@
 <c:import url="header.jsp"/>
 <div class="content-bg">
     <h2>Вход в личный кабинет</h2>
-    <form action="<c:url value="/login"/>" class='send' method="post">
+    <form action="<c:url value="/j_spring_security_check"/>" class='send' method="post">
         <c:if test="${not empty error}">
             <div style="color: red">${error}</div>
         </c:if>

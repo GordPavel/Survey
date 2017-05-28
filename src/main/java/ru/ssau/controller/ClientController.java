@@ -78,38 +78,33 @@ public class ClientController{
     }
 
     @RequestMapping( value = "/registration", method = RequestMethod.POST )
-    public ResponseEntity<?> newUser( @RequestParam( "newUser" ) String JSONUser ){
-        try{
-            User user = new ObjectMapper().readValue( JSONUser, User.class );
-            if( validator.validate( user ) ){
-                userService.saveUser( user );
-                return ResponseEntity.ok().build();
-            }else
-                return ResponseEntity.badRequest().build();
-        }catch( IOException e ){
+    public ResponseEntity<?> newUser( @RequestParam( "newUser" ) String JSONUser ) throws IOException{
+        User user = new ObjectMapper().readValue( JSONUser, User.class );
+        if( validator.validate( user ) ){
+            userService.saveUser( user );
+            return ResponseEntity.ok().build();
+        }else
             return ResponseEntity.badRequest().build();
-        }
     }
 
     @RequestMapping( value = "/img", method = RequestMethod.GET )
-    public ResponseEntity<?> getImage( @RequestParam String id ){
-        try{
-            MyFile file = filesManager.getFile( id + ".png" );
-            return ResponseEntity.accepted().headers( file.getHeaders() ).body( file.getBytes() );
-        }catch( IllegalArgumentException | IOException e ){
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<?> getImage( @RequestParam String id ) throws IOException{
+        MyFile file = filesManager.getFile( id + ".png" );
+        return ResponseEntity.accepted().headers( file.getHeaders() ).body( file.getBytes() );
     }
 
-    @RequestMapping( value = "/upload", method = RequestMethod.POST )
+    @RequestMapping( value = "/img/upload", method = RequestMethod.POST )
     public ResponseEntity<?> uploadPic( @RequestParam( value = "profile_picture" ) MultipartFile file,
-                                        @RequestParam( value = "userLogin" ) String userLogin ){
-        try{
-            filesManager.saveFile( file.getBytes(), userLogin );
-            return ResponseEntity.ok().build();
-        }catch( IOException e ){
-            return ResponseEntity.badRequest().build();
-        }
+                                        @RequestParam( value = "userLogin" ) String userLogin ) throws IOException{
+        filesManager.saveFile( file.getBytes(), userLogin );
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping( value = "/img/delete", method = RequestMethod.DELETE )
+    public ResponseEntity<?> deletePic( @RequestParam( value = "login" ) String location ) throws IOException{
+        int a = 1;
+        filesManager.deleteFile( location );
+        return ResponseEntity.ok().build();
     }
 }
 
