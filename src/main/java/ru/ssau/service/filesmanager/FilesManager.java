@@ -7,5 +7,5 @@ public interface FilesManager{
 
     boolean saveFile( byte[] file, String location ) throws IOException;
 
-    String getFilesDir();
+    boolean deleteFile( String location ) throws IOException;
 }

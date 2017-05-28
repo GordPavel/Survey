@@ -4,6 +4,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -16,6 +17,7 @@ import ru.ssau.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebMvc
+@PropertySource( "classpath:app.properties" )
 @ComponentScan( "ru.ssau" )
 public class WebAppConfig extends WebMvcConfigurerAdapter{
 

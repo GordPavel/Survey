@@ -11,7 +11,6 @@ public class User{
     private UserRoles    role;
     private List<Survey> doneSurveys;
     private List<Survey> madeSurveys;
-    private String       fileId;
 
     public User(){
     }
@@ -21,10 +20,9 @@ public class User{
         role = UserRoles.USER;
     }
 
-    public User( String login, String password, String fileId ){
+    public User( String login, String password ){
         this.login = login;
         this.password = password;
-        this.fileId = fileId;
     }
 
     public User( String login, String password, String name, String lastName, UserRoles role ){
@@ -33,23 +31,6 @@ public class User{
         this.name = name;
         this.lastName = lastName;
         this.role = role;
-    }
-
-    public User( String login, String password, String name, String lastName, UserRoles role , String fileId ){
-        this.login = login;
-        this.password = password;
-        this.name = name;
-        this.lastName = lastName;
-        this.role = role;
-        this.fileId = fileId;
-    }
-
-    public String getFileId(){
-        return fileId;
-    }
-
-    public void setFileId( String fileId ){
-        this.fileId = fileId;
     }
 
     public List<Survey> getDoneSurveys(){

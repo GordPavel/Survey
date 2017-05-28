@@ -68,16 +68,11 @@ public class SurveyServiceImpl implements SurveyService{
     public List<Category> getCategories(){
 //        сначала преобразуем в лист RatingTopics, чтобы можно было сортировать по отвеченным пользователям,
 //        затем снова преобразуем в лист Category, сортируем внутри каждой категории все анкеты и собираем в лист
-        return categoriesMap.values().stream()
-                .map( category -> new RatingTopics( category.getSurveys().stream()
-                                                            .mapToInt( Survey::getUsersDone )
-                                                            .reduce( ( a, b ) -> a + b ).getAsInt(),
-                                                            category ) )
-                .sorted( ( a, b ) -> Integer.compare( b.getUsersDone() , a.getUsersDone() ) )
-                .map( ratingTopics -> ratingTopics.category )
-                .peek( category ->
-                               category.getSurveys().sort( ( a, b ) -> Integer.compare( b.getUsersDone() , a.getUsersDone() )  ) )
-                .collect( Collectors.toList() );
+        return categoriesMap.values().stream().map( category -> new RatingTopics(
+                category.getSurveys().stream().mapToInt( Survey::getUsersDone ).reduce( ( a, b ) -> a + b ).getAsInt(),
+                category ) ).sorted( ( a, b ) -> Integer.compare( b.getUsersDone(), a.getUsersDone() ) ).map(
+                ratingTopics -> ratingTopics.category ).peek( category -> category.getSurveys().sort(
+                ( a, b ) -> Integer.compare( b.getUsersDone(), a.getUsersDone() ) ) ).collect( Collectors.toList() );
     }
 
     class RatingTopics{

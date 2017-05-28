@@ -11,7 +11,9 @@ import ru.ssau.transport.UserRegistrationForm;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class UserRegistrationValidator implements Validator{
@@ -46,15 +48,21 @@ public class UserRegistrationValidator implements Validator{
         if( !user.getPasswordRepeat().equals( user.getPassword() ) )
             errors.rejectValue( "passwordRepeat", "Diff.userForm.password" );
 
-        if( !user.getFile().isEmpty() )
-            if( !new LinkedList<>(
-                    Arrays.asList( user.getFile().getOriginalFilename().split( "\\." ) ) ).getLast().equals( "jpg" ) )
+        if( !user.getFile().isEmpty() ){
+            String type = new LinkedList<>(
+                    Arrays.asList( user.getFile().getOriginalFilename().split( "\\." ) ) ).getLast().toLowerCase();
+            if( !( type.equals( "jpg" ) || type.equals( "png" ) ) )
                 errors.rejectValue( "file", "File.notJPG" );
+        }
     }
 
     //    Для клиентской формы
-    public boolean validate( UserRegistrationForm userRegistrationForm, Errors errors ){
-        // TODO: 02.04.17 Валидация
+    public boolean validate( User user ){
+        List<String> usersLogins = userService.getUsers().stream().map( User::getLogin ).collect( Collectors.toList() );
+        if( usersLogins.contains( user.getLogin() ) )
+            return false;
+        if( user.getPassword().length() < 6 || user.getPassword().length() > 32 )
+            return false;
         return true;
     }
 }
