@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import ru.ssau.domain.Category;
+import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
 import ru.ssau.exceptions.SurveyNotFoundException;
 import ru.ssau.service.SurveyService;
@@ -21,8 +23,10 @@ import ru.ssau.service.filesmanager.FilesManager;
 import ru.ssau.service.filesmanager.MyFile;
 import ru.ssau.service.validation.UserRegistrationValidator;
 import ru.ssau.transport.SurveyTransport;
+import ru.ssau.transport.TopicTransport;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,11 +46,17 @@ public class ClientController{
     @Autowired
     private ShaPasswordEncoder        passwordEncoder;
 
-
     @RequestMapping( value = "/topSurveys", method = RequestMethod.GET, headers = "Accept=application/json" )
-    public List<SurveyTransport> topSurveys(){
-        return surveyService.getTop().stream().map(
-                survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect( Collectors.toList() );
+    public List<SurveyTransport> topSurveys( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
+                                             @RequestParam( required = false, defaultValue = "5" ) Integer limit ){
+        if( sortBy.equals( "users" ) )
+            return surveyService.getTop().stream().sorted( Comparator.comparingInt( Survey::getUsersDone ) ).limit(
+                    limit ).map( survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect(
+                    Collectors.toList() );
+        else
+            return surveyService.getTop().stream().sorted(
+                    Comparator.comparingLong( ( survey ) -> survey.getDate().getTime() ) ).limit( limit ).map(
+                    survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect( Collectors.toList() );
     }
 
     @RequestMapping( value = "/survey", method = RequestMethod.GET )
@@ -66,8 +76,7 @@ public class ClientController{
     }
 
     @RequestMapping( value = "/login", method = RequestMethod.POST )
-    public ResponseEntity<?> login( @RequestParam( defaultValue = "" ) String login,
-                                    @RequestParam( defaultValue = "" ) String password ){
+    public ResponseEntity<?> login( @RequestParam String login, @RequestParam String password ){
         Optional<User> userOptional = userService.getUser( login );
         if( !userOptional.isPresent() )
             return ResponseEntity.notFound().build();
@@ -87,6 +96,46 @@ public class ClientController{
             return ResponseEntity.badRequest().build();
     }
 
+    @RequestMapping( value = "/topics", method = RequestMethod.GET )
+    public ResponseEntity<?> topics( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
+                                     @RequestParam( required = false, defaultValue = "3" ) Integer limit ){
+        List<TopicTransport> list;
+        if( sortBy.equals( "users" ) )
+            list = surveyService.getCategories().stream().map( category -> new TopicTransport( category.getName(),
+                                                                                               category.getSurveys().stream().sorted(
+                                                                                                       Comparator.comparingInt(
+                                                                                                               Survey::getUsersDone ) ).limit(
+                                                                                                       limit ).map(
+                                                                                                       survey -> new SurveyTransport(
+                                                                                                               survey.getId(),
+                                                                                                               survey.getName() ) ).collect(
+                                                                                                       Collectors.toList() ) ) ).collect(
+                    Collectors.toList() );
+        else{
+            list = surveyService.getCategories().stream().map( category -> new TopicTransport( category.getName(),
+                                                                                               category.getSurveys().stream().sorted(
+                                                                                                       Comparator.comparingLong(
+                                                                                                               survey -> survey.getDate().getTime() ) ).limit(
+                                                                                                       limit ).map(
+                                                                                                       survey -> new SurveyTransport(
+                                                                                                               survey.getId(),
+                                                                                                               survey.getName() ) ).collect(
+                                                                                                       Collectors.toList() ) ) ).collect(
+                    Collectors.toList() );
+        }
+        return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body( list );
+    }
+
+    @RequestMapping( value = "/topic", method = RequestMethod.GET )
+    public ResponseEntity<?> getTopic( @RequestParam String name ){
+        Optional<Category> optional = surveyService.getCategoryByName( name );
+        return optional.<ResponseEntity<?>>map(
+                category -> ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
+                        new TopicTransport( category.getName(), category.getSurveys().stream().map(
+                                survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect(
+                                Collectors.toList() ) ) ) ).orElseGet( () -> ResponseEntity.notFound().build() );
+    }
+
     @RequestMapping( value = "/img", method = RequestMethod.GET )
     public ResponseEntity<?> getImage( @RequestParam String id ) throws IOException{
         MyFile file = filesManager.getFile( id + ".png" );
@@ -102,7 +151,6 @@ public class ClientController{
 
     @RequestMapping( value = "/img/delete", method = RequestMethod.DELETE )
     public ResponseEntity<?> deletePic( @RequestParam( value = "login" ) String location ) throws IOException{
-        int a = 1;
         filesManager.deleteFile( location );
         return ResponseEntity.ok().build();
     }

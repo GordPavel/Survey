@@ -6,10 +6,7 @@ import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
 import ru.ssau.exceptions.SurveyNotFoundException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,6 +41,7 @@ public class SurveyServiceImpl implements SurveyService{
         return Optional.of( surveys.get( id ) );
     }
 
+
     @Override
     public Optional<User> getMadeUser( Integer id ){
         return Optional.ofNullable(
@@ -52,8 +50,7 @@ public class SurveyServiceImpl implements SurveyService{
 
     @Override
     public List<Survey> getTop(){
-        return surveys.values().stream().sorted( ( a, b ) -> b.getUsersDone() - a.getUsersDone() ).collect(
-                Collectors.toList() );
+        return new ArrayList<>( surveys.values() );
     }
 
     @Override
@@ -68,11 +65,13 @@ public class SurveyServiceImpl implements SurveyService{
     public List<Category> getCategories(){
 //        сначала преобразуем в лист RatingTopics, чтобы можно было сортировать по отвеченным пользователям,
 //        затем снова преобразуем в лист Category, сортируем внутри каждой категории все анкеты и собираем в лист
-        return categoriesMap.values().stream().map( category -> new RatingTopics(
-                category.getSurveys().stream().mapToInt( Survey::getUsersDone ).reduce( ( a, b ) -> a + b ).getAsInt(),
-                category ) ).sorted( ( a, b ) -> Integer.compare( b.getUsersDone(), a.getUsersDone() ) ).map(
-                ratingTopics -> ratingTopics.category ).peek( category -> category.getSurveys().sort(
-                ( a, b ) -> Integer.compare( b.getUsersDone(), a.getUsersDone() ) ) ).collect( Collectors.toList() );
+        return categoriesMap.values().stream()
+
+                .map( category -> new RatingTopics(
+                        category.getSurveys().stream().mapToInt( Survey::getUsersDone ).reduce(
+                                ( a, b ) -> a + b ).getAsInt(), category ) ).sorted(
+                        ( a, b ) -> Integer.compare( b.getUsersDone(), a.getUsersDone() ) ).map(
+                        ratingTopics -> ratingTopics.category ).collect( Collectors.toList() );
     }
 
     class RatingTopics{
