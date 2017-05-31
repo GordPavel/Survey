@@ -14,7 +14,15 @@ public class Survey{
     private List<User>     users;
     private List<Question> questions;
     private User           madeByUser;
-    private File           file;
+    private Date           date;
+
+    public Date getDate(){
+        return date;
+    }
+
+    public void setDate( Date date ){
+        this.date = date;
+    }
 
 
     public Survey(){
@@ -88,13 +96,5 @@ public class Survey{
 
     public void setMadeByUser( User madeByUser ){
         this.madeByUser = madeByUser;
-    }
-
-    public File getFile(){
-        return file;
-    }
-
-    public void setFile( File file ){
-        this.file = file;
     }
 }
