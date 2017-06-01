@@ -1,5 +1,8 @@
 package ru.ssau.controller;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +30,7 @@ import ru.ssau.transport.TopicTransport;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -134,6 +138,29 @@ public class ClientController{
                         new TopicTransport( category.getName(), category.getSurveys().stream().map(
                                 survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect(
                                 Collectors.toList() ) ) ) ).orElseGet( () -> ResponseEntity.notFound().build() );
+    }
+
+
+    @RequestMapping( value = "/doneSurvey", method = RequestMethod.POST )
+    public void doneSurvey( @RequestParam String answers, @RequestParam Integer id, @RequestParam String login ) throws
+                                                                                                                 IOException{
+        List<Integer> listAnswers = new ObjectMapper().readValue( answers, new TypeReference<List<Integer>>(){
+        } );
+        Survey survey = surveyService.getSurveyById( id ).get();
+        User   user   = userService.getUser( login ).get();
+        return;
+    }
+
+    @RequestMapping( value = "/createdSurvey", method = RequestMethod.POST )
+    public void newSurvey( @RequestParam String createdSurvey ) throws IOException{
+        Survey survey = null;
+        try{
+            survey = new ObjectMapper().readValue( createdSurvey, Survey.class );
+        }catch( JsonParseException | JsonMappingException e ){
+            e.printStackTrace();
+        }
+        survey.setDate( new Date() );
+        return;
     }
 
     @RequestMapping( value = "/img", method = RequestMethod.GET )
