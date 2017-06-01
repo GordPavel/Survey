@@ -1,12 +1,12 @@
 package ru.ssau.domain;
 
-public enum UserRoles{
+public enum UserRole{
 
     ADMIN,
     USER,
     ANONYMOUS;
 
-    UserRoles() {
+    UserRole() {
     }
 
 }

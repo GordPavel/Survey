@@ -1,27 +1,31 @@
 package ru.ssau.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.ssau.DAO.SurveyDAO;
 import ru.ssau.domain.Survey;
 import ru.ssau.domain.Topic;
 import ru.ssau.domain.User;
-import ru.ssau.exceptions.SurveyNotFoundException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class SurveyServiceImpl implements SurveyService{
 
-    // TODO: 01.06.17 Работа с БД
+
+    @Autowired
+    private SurveyDAO surveyDAO;
 
     @Override
     public Optional<Survey> getSurveyById( Integer id ){
-        return null;
+        return Optional.of( surveyDAO.getById( id ) );
     }
 
+    @Override
+    public void saveSurvey( Survey survey ){
+
+    }
 
     @Override
     public Optional<User> getMadeUser( Integer id ){

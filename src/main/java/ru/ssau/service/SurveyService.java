@@ -1,7 +1,7 @@
 package ru.ssau.service;
 
-import ru.ssau.domain.Topic;
 import ru.ssau.domain.Survey;
+import ru.ssau.domain.Topic;
 import ru.ssau.domain.User;
 
 import java.util.List;
@@ -18,4 +18,6 @@ public interface SurveyService{
     Optional<Topic> getCategoryByName( String name );
 
     List<Topic> getCategories();
+
+    void saveSurvey( Survey survey );
 }

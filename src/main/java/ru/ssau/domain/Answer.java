@@ -1,9 +1,19 @@
 package ru.ssau.domain;
 
+import javax.persistence.*;
+
+@Entity
+@Table( name = "answer" )
 public class Answer{
 
-    private Integer id;
-    private String  name;
+    @Id
+    @GeneratedValue( strategy = GenerationType.AUTO )
+    private Integer  id;
+    @Column( name = "name" )
+    private String   name;
+    @ManyToOne
+    @JoinColumn( name = "question_id", referencedColumnName = "id" )
+    private Question question;
 
     public Answer(){
     }
@@ -22,5 +32,13 @@ public class Answer{
 
     public void setName( String name ){
         this.name = name;
+    }
+
+    public Question getQuestion(){
+        return question;
+    }
+
+    public void setQuestion( Question question ){
+        this.question = question;
     }
 }

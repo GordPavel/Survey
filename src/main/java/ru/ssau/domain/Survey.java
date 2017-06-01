@@ -1,17 +1,28 @@
 package ru.ssau.domain;
 
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
 public class Survey{
 
-    private Integer        id;
-    private String         name;
-    private String         comment;
+    @Id
+    @GeneratedValue( strategy = GenerationType.AUTO )
+    private Integer id;
+    @Column( name = "name" )
+    private String  name;
+    @Column( name = "comment" )
+    private String  comment;
+
     private List<User>     users;
+    @OneToMany
     private List<Question> questions;
-    private User           madeByUser;
-    private Date           date;
+
+    private User madeByUser;
+
+    @Temporal( TemporalType.DATE )
+    @Column( name = "madeTime" )
+    private Date date;
 
 
     public Survey(){
@@ -42,7 +53,7 @@ public class Survey{
     }
 
     public Integer getUsersDone(){
-        return users.size();
+        return getUsers().size();
     }
 
     public List<User> getUsers(){

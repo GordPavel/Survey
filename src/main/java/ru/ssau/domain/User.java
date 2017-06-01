@@ -8,7 +8,7 @@ public class User{
     private String           password;
     private String           name;
     private String           lastName;
-    private UserRoles        role;
+    private UserRole         role;
     private List<UserAnswer> answers;
     private List<Survey>     created;
 
@@ -47,11 +47,11 @@ public class User{
         this.lastName = lastName;
     }
 
-    public UserRoles getRole(){
+    public UserRole getRole(){
         return role;
     }
 
-    public void setRole( UserRoles role ){
+    public void setRole( UserRole role ){
         this.role = role;
     }
 

@@ -15,6 +15,9 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 import ru.ssau.service.UserDetailsServiceImpl;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 @Configuration
 @EnableWebMvc
 @PropertySource( "classpath:app.properties" )
@@ -24,6 +27,11 @@ public class WebAppConfig extends WebMvcConfigurerAdapter{
     @Override
     public void addResourceHandlers( ResourceHandlerRegistry registry ){
         registry.addResourceHandler( "/pages/**" ).addResourceLocations( "/pages/" );
+    }
+
+    @Bean
+    public EntityManagerFactory entityManager(){
+        return Persistence.createEntityManagerFactory( "newPersistenceManagerFactory" );
     }
 
     @Bean

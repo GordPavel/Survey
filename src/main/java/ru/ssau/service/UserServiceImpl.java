@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.ssau.domain.User;
-import ru.ssau.domain.UserRoles;
 import ru.ssau.service.filesmanager.FilesManager;
 import ru.ssau.transport.UserRegistrationForm;
 
