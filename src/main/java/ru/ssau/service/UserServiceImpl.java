@@ -14,6 +14,7 @@ import java.util.*;
 @Service
 public class UserServiceImpl implements UserService{
 
+    // TODO: 01.06.17 Работа с БД
 
     @Autowired
     private ShaPasswordEncoder passwordEncoder;
@@ -21,53 +22,24 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private FilesManager filesManager;
 
-
-    private static Map<String, User> users;
-
-    static{
-        String adminPasswordHashSha256 = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
-        String userPasswordHashSha256  = "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb";
-
-        users = new HashMap<>();
-        users.put( "admin", new User( "admin", adminPasswordHashSha256, "name", "lastName", UserRoles.ADMIN ) );
-        users.put( "user", new User( "user", userPasswordHashSha256, "name", "lastName", UserRoles.USER ) );
-    }
-
     @Override
     public Optional<User> getUser( String login ){
-        if( !users.containsKey( login ) )
-            return Optional.empty();
-        return Optional.of( users.get( login ) );
+        return null;
     }
 
     @Override
     public List<User> getUsers(){
-        return new ArrayList<>( users.values() );
+        return null;
     }
 
     @Override
     public void saveUser( UserRegistrationForm userRegistrationForm ) throws IOException{
-        User user = new User();
-        user.setLogin( userRegistrationForm.getLogin() );
-        user.setName( userRegistrationForm.getName() );
-        user.setLastName( userRegistrationForm.getLastName() );
-        user.setPassword( passwordEncoder.encodePassword( userRegistrationForm.getPassword(), null ) );
-        user.setRole( UserRoles.USER );
-        if( !userRegistrationForm.getFile().isEmpty() )
-            filesManager.saveFile( userRegistrationForm.getFile().getBytes(),
-                                   userRegistrationForm.getLogin() + ".png" );
-        users.put( user.getLogin(), user );
+        return ;
     }
 
     @Override
     public void saveUser( User userForm ) throws IOException{
-        User newUser = new User();
-        newUser.setLogin( userForm.getLogin() );
-        newUser.setName( userForm.getName() );
-        newUser.setLastName( userForm.getLastName() );
-        newUser.setPassword( passwordEncoder.encodePassword( userForm.getPassword(), null ) );
-        newUser.setRole( UserRoles.USER );
-        users.put( newUser.getLogin(), newUser );
+        return;
     }
 
 }

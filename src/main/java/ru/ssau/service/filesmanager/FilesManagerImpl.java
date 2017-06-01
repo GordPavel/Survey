@@ -15,7 +15,6 @@ import static java.nio.file.Paths.get;
 @Service
 public class FilesManagerImpl implements FilesManager{
 
-
     @Autowired
     private Environment environment;
 

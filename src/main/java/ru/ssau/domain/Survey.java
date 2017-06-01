@@ -1,10 +1,7 @@
 package ru.ssau.domain;
 
-import java.io.File;
+import java.util.Date;
 import java.util.List;
-import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Survey{
 
@@ -14,44 +11,14 @@ public class Survey{
     private List<User>     users;
     private List<Question> questions;
     private User           madeByUser;
-    private File           file;
+    private Date           date;
 
 
     public Survey(){
     }
 
-    public Survey( Integer id ){
-        this.id = id;
-        name = "survey" + id;
-        comment = "test";
-        users = Stream.iterate( new User( "login" + 1 ), new UnaryOperator<User>(){
-            int i = 1;
-            @Override
-            public User apply( User t ){
-                return new User( "login" + ( ++i ) );
-            }
-        } ).limit( ( int )( 1 + ( long ) ( Math.random() * ( 6 - 1 ) ) ) ).collect( Collectors.toList() );
-        questions = Stream.iterate( new Question( 1 ), new UnaryOperator<Question>(){
-            int i = 1;
-            @Override
-            public Question apply( Question t ){
-                return new Question( ++i );
-            }
-        } ).limit( ( int )( 1 + ( long ) ( Math.random() * ( 6 - 1 ) ) ) ).collect( Collectors.toList() );
-        madeByUser = users.get( 0 );
-    }
-
-
     public Integer getId(){
         return id;
-    }
-
-    public List<Question> getQuestions(){
-        return questions;
-    }
-
-    public void setQuestions( List<Question> questions ){
-        this.questions = questions;
     }
 
     public void setId( Integer id ){
@@ -74,12 +41,24 @@ public class Survey{
         this.comment = comment;
     }
 
+    public Integer getUsersDone(){
+        return users.size();
+    }
+
+    public List<User> getUsers(){
+        return users;
+    }
+
     public void setUsers( List<User> users ){
         this.users = users;
     }
 
-    public Integer getUsersDone(){
-        return users.size();
+    public List<Question> getQuestions(){
+        return questions;
+    }
+
+    public void setQuestions( List<Question> questions ){
+        this.questions = questions;
     }
 
     public User getMadeByUser(){
@@ -90,11 +69,11 @@ public class Survey{
         this.madeByUser = madeByUser;
     }
 
-    public File getFile(){
-        return file;
+    public Date getDate(){
+        return date;
     }
 
-    public void setFile( File file ){
-        this.file = file;
+    public void setDate( Date date ){
+        this.date = date;
     }
 }

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import ru.ssau.domain.Category;
+import ru.ssau.domain.Topic;
 import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
 import ru.ssau.exceptions.SurveyNotFoundException;
@@ -101,8 +101,8 @@ public class ClientController{
                                      @RequestParam( required = false, defaultValue = "3" ) Integer limit ){
         List<TopicTransport> list;
         if( sortBy.equals( "users" ) )
-            list = surveyService.getCategories().stream().map( category -> new TopicTransport( category.getName(),
-                                                                                               category.getSurveys().stream().sorted(
+            list = surveyService.getCategories().stream().map( topic -> new TopicTransport( topic.getName(),
+                                                                                            topic.getSurveys().stream().sorted(
                                                                                                        Comparator.comparingInt(
                                                                                                                Survey::getUsersDone ) ).limit(
                                                                                                        limit ).map(
@@ -112,8 +112,8 @@ public class ClientController{
                                                                                                        Collectors.toList() ) ) ).collect(
                     Collectors.toList() );
         else{
-            list = surveyService.getCategories().stream().map( category -> new TopicTransport( category.getName(),
-                                                                                               category.getSurveys().stream().sorted(
+            list = surveyService.getCategories().stream().map( topic -> new TopicTransport( topic.getName(),
+                                                                                            topic.getSurveys().stream().sorted(
                                                                                                        Comparator.comparingLong(
                                                                                                                survey -> survey.getDate().getTime() ) ).limit(
                                                                                                        limit ).map(
@@ -128,10 +128,10 @@ public class ClientController{
 
     @RequestMapping( value = "/topic", method = RequestMethod.GET )
     public ResponseEntity<?> getTopic( @RequestParam String name ){
-        Optional<Category> optional = surveyService.getCategoryByName( name );
+        Optional<Topic> optional = surveyService.getCategoryByName( name );
         return optional.<ResponseEntity<?>>map(
-                category -> ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
-                        new TopicTransport( category.getName(), category.getSurveys().stream().map(
+                topic -> ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
+                        new TopicTransport( topic.getName(), topic.getSurveys().stream().map(
                                 survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect(
                                 Collectors.toList() ) ) ) ).orElseGet( () -> ResponseEntity.notFound().build() );
     }

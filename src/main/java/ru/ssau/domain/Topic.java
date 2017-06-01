@@ -2,8 +2,7 @@ package ru.ssau.domain;
 
 import java.util.List;
 
-public class Category{
-
+public class Topic{
     private String       name;
     private List<Survey> surveys;
 
@@ -11,7 +10,7 @@ public class Category{
         return name;
     }
 
-    public Category( String name, List<Survey> surveys ){
+    public Topic( String name, List<Survey> surveys ){
         this.name = name;
         this.surveys = surveys;
     }

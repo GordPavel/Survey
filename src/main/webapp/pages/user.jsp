@@ -28,7 +28,7 @@
             <td>
                 <div class="article">
                     <div class="scroll"><pre>
-                        <c:forEach items="${user.madeSurveys}" var="survey">
+                        <c:forEach items="${user.created}" var="survey">
                             <li><a href="<c:url value="/survey?id=${survey.id}"/>">${surve.name}</a></li>
                         </c:forEach>
  </pre>
