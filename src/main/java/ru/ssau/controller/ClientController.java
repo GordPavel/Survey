@@ -79,11 +79,12 @@ public class ClientController{
                 userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ) ) );
     }
     
-    @RequestMapping( value = "/user/doneSurveys", method = RequestMethod.GET )
-    public ResponseEntity<?> getUserByLogin( @RequestParam String login ){
-        return ResposeEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 )
-            .body( userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ).getDoneSurveys() );
+      @RequestMapping( value = "/user/doneSurveys", method = RequestMethod.GET )
+    public ResponseEntity<?> getDoneSurveysByLogin( @RequestParam String login ){
+        return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 )
+            .body( userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ) ).getDoneSurveys() );
     }
+
 
     @RequestMapping( value = "/login", method = RequestMethod.POST )
     public ResponseEntity<?> login( @RequestParam String login, @RequestParam String password ){
