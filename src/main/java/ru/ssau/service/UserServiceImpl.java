@@ -3,6 +3,7 @@ package ru.ssau.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
 import ru.ssau.domain.UserRoles;
 import ru.ssau.service.filesmanager.FilesManager;
@@ -29,7 +30,12 @@ public class UserServiceImpl implements UserService{
         String userPasswordHashSha256  = "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb";
 
         users = new HashMap<>();
-        users.put( "admin", new User( "admin", adminPasswordHashSha256, "name", "lastName", UserRoles.ADMIN ) );
+        User         user = new User( "admin", adminPasswordHashSha256, "name", "lastName", UserRoles.ADMIN );
+        List<Survey> list = new ArrayList<>();
+        list.add( new Survey( 7 ) );
+        list.add( new Survey( 8 ) );
+        user.setDoneSurveys( list );
+        users.put( "admin", user );
         users.put( "user", new User( "user", userPasswordHashSha256, "name", "lastName", UserRoles.USER ) );
     }
 
