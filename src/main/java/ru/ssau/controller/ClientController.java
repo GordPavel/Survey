@@ -78,6 +78,12 @@ public class ClientController{
         return ResponseEntity.accepted().headers( headers ).body(
                 userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ) ) );
     }
+    
+    @RequestMapping( value = "/user/doneSurveys", method = RequestMethod.GET )
+    public ResponseEntity<?> getUserByLogin( @RequestParam String login ){
+        return ResposeEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 )
+            .body( userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ).getDoneSurveys() );
+    }
 
     @RequestMapping( value = "/login", method = RequestMethod.POST )
     public ResponseEntity<?> login( @RequestParam String login, @RequestParam String password ){
