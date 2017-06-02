@@ -1,32 +1,37 @@
 package ru.ssau.domain;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+@Entity
 public class Survey{
-
     @Id
     @GeneratedValue( strategy = GenerationType.AUTO )
+    @Column( name = "id" )
     private Integer id;
-    @Column( name = "name" )
-    private String  name;
+    @Basic
     @Column( name = "comment" )
     private String  comment;
 
-    private List<User>     users;
-    @OneToMany
-    private List<Question> questions;
-
-    private User madeByUser;
-
+    @Basic
+    @Column( name = "name", nullable = false, length = 45 )
+    private String name;
     @Temporal( TemporalType.DATE )
     @Column( name = "madeTime" )
-    private Date date;
+    private Date   date;
 
+    @ManyToOne
+    @JoinColumn( name = "topic_name", referencedColumnName = "name" )
+    private Topic topic;
 
-    public Survey(){
-    }
+    @OneToMany
+    private List<UserAnswer> answers;
+
+    @ManyToOne
+    @JoinColumn( name = "userMade", referencedColumnName = "login" )
+    private User creator;
 
     public Integer getId(){
         return id;
@@ -34,14 +39,6 @@ public class Survey{
 
     public void setId( Integer id ){
         this.id = id;
-    }
-
-    public String getName(){
-        return name;
-    }
-
-    public void setName( String name ){
-        this.name = name;
     }
 
     public String getComment(){
@@ -52,39 +49,77 @@ public class Survey{
         this.comment = comment;
     }
 
-    public Integer getUsersDone(){
-        return getUsers().size();
+    public String getName(){
+        return name;
     }
 
-    public List<User> getUsers(){
-        return users;
-    }
-
-    public void setUsers( List<User> users ){
-        this.users = users;
-    }
-
-    public List<Question> getQuestions(){
-        return questions;
-    }
-
-    public void setQuestions( List<Question> questions ){
-        this.questions = questions;
-    }
-
-    public User getMadeByUser(){
-        return madeByUser;
-    }
-
-    public void setMadeByUser( User madeByUser ){
-        this.madeByUser = madeByUser;
+    public void setName( String name ){
+        this.name = name;
     }
 
     public Date getDate(){
         return date;
     }
 
-    public void setDate( Date date ){
-        this.date = date;
+    public void setDate( Timestamp madeTime ){
+        this.date = madeTime;
+    }
+
+    public Topic getTopic(){
+        return topic;
+    }
+
+    public void setTopic( Topic topic ){
+        this.topic = topic;
+    }
+
+    public Integer getUsersDone(){
+        return getAnswers().size();
+    }
+
+    public List<UserAnswer> getAnswers(){
+        return answers;
+    }
+
+    public void setAnswers( List<UserAnswer> answers ){
+        this.answers = answers;
+    }
+
+    public User getCreator(){
+        return creator;
+    }
+
+    public void setCreator( User creator ){
+        this.creator = creator;
+    }
+
+    @Override
+    public boolean equals( Object o ){
+        if( this == o )
+            return true;
+        if( o == null || getClass() != o.getClass() )
+            return false;
+
+        Survey survey = ( Survey ) o;
+
+        if( id != null ? !id.equals( survey.id ) : survey.id != null )
+            return false;
+        if( comment != null ? !comment.equals( survey.comment ) : survey.comment != null )
+            return false;
+        if( name != null ? !name.equals( survey.name ) : survey.name != null )
+            return false;
+        if( date != null ? !date.equals( survey.date ) : survey.date != null )
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode(){
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + ( comment != null ? comment.hashCode() : 0 );
+        result = 31 * result + ( name != null ? name.hashCode() : 0 );
+        result = 31 * result + ( date != null ? date.hashCode() : 0 );
+        return result;
     }
 }

@@ -4,7 +4,7 @@ import ru.ssau.domain.Survey;
 
 public interface SurveyDAO{
 
-    Survey createNewSurvey( Survey survey );
+    void createNewSurvey( Survey survey );
 
     void removeSurvey( Survey survey );
 

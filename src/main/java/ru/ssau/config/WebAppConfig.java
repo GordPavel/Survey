@@ -29,10 +29,6 @@ public class WebAppConfig extends WebMvcConfigurerAdapter{
         registry.addResourceHandler( "/pages/**" ).addResourceLocations( "/pages/" );
     }
 
-    @Bean
-    public EntityManagerFactory entityManager(){
-        return Persistence.createEntityManagerFactory( "newPersistenceManagerFactory" );
-    }
 
     @Bean
     public UserDetailsService getUserDetailsService(){

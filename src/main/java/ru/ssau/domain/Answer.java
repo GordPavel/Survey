@@ -1,23 +1,17 @@
 package ru.ssau.domain;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Entity
-@Table( name = "answer" )
 public class Answer{
+    private Integer id;
+    private String name;
 
     @Id
-    @GeneratedValue( strategy = GenerationType.AUTO )
-    private Integer  id;
-    @Column( name = "name" )
-    private String   name;
-    @ManyToOne
-    @JoinColumn( name = "question_id", referencedColumnName = "id" )
-    private Question question;
-
-    public Answer(){
-    }
-
+    @Column( name = "id", nullable = false )
     public Integer getId(){
         return id;
     }
@@ -26,6 +20,8 @@ public class Answer{
         this.id = id;
     }
 
+    @Basic
+    @Column( name = "name", nullable = false, length = 45 )
     public String getName(){
         return name;
     }
@@ -34,11 +30,27 @@ public class Answer{
         this.name = name;
     }
 
-    public Question getQuestion(){
-        return question;
+    @Override
+    public boolean equals( Object o ){
+        if( this == o )
+            return true;
+        if( o == null || getClass() != o.getClass() )
+            return false;
+
+        Answer answer = ( Answer ) o;
+
+        if( id != null ? !id.equals( answer.id ) : answer.id != null )
+            return false;
+        if( name != null ? !name.equals( answer.name ) : answer.name != null )
+            return false;
+
+        return true;
     }
 
-    public void setQuestion( Question question ){
-        this.question = question;
+    @Override
+    public int hashCode(){
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + ( name != null ? name.hashCode() : 0 );
+        return result;
     }
 }

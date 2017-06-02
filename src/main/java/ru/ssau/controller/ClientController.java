@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import ru.ssau.domain.Topic;
 import ru.ssau.domain.Survey;
+import ru.ssau.domain.Topic;
 import ru.ssau.domain.User;
 import ru.ssau.exceptions.SurveyNotFoundException;
 import ru.ssau.service.SurveyService;
@@ -103,24 +103,24 @@ public class ClientController{
         if( sortBy.equals( "users" ) )
             list = surveyService.getCategories().stream().map( topic -> new TopicTransport( topic.getName(),
                                                                                             topic.getSurveys().stream().sorted(
-                                                                                                       Comparator.comparingInt(
-                                                                                                               Survey::getUsersDone ) ).limit(
-                                                                                                       limit ).map(
-                                                                                                       survey -> new SurveyTransport(
-                                                                                                               survey.getId(),
-                                                                                                               survey.getName() ) ).collect(
-                                                                                                       Collectors.toList() ) ) ).collect(
+                                                                                                    Comparator.comparingInt(
+                                                                                                            Survey::getUsersDone ) ).limit(
+                                                                                                    limit ).map(
+                                                                                                    survey -> new SurveyTransport(
+                                                                                                            survey.getId(),
+                                                                                                            survey.getName() ) ).collect(
+                                                                                                    Collectors.toList() ) ) ).collect(
                     Collectors.toList() );
         else{
             list = surveyService.getCategories().stream().map( topic -> new TopicTransport( topic.getName(),
                                                                                             topic.getSurveys().stream().sorted(
-                                                                                                       Comparator.comparingLong(
-                                                                                                               survey -> survey.getDate().getTime() ) ).limit(
-                                                                                                       limit ).map(
-                                                                                                       survey -> new SurveyTransport(
-                                                                                                               survey.getId(),
-                                                                                                               survey.getName() ) ).collect(
-                                                                                                       Collectors.toList() ) ) ).collect(
+                                                                                                    Comparator.comparingLong(
+                                                                                                            survey -> survey.getDate().getTime() ) ).limit(
+                                                                                                    limit ).map(
+                                                                                                    survey -> new SurveyTransport(
+                                                                                                            survey.getId(),
+                                                                                                            survey.getName() ) ).collect(
+                                                                                                    Collectors.toList() ) ) ).collect(
                     Collectors.toList() );
         }
         return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body( list );

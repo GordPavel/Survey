@@ -1,25 +1,17 @@
 package ru.ssau.domain;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Entity
 public class Question{
+    private Integer id;
+    private String name;
 
     @Id
-    @GeneratedValue( strategy = GenerationType.AUTO )
-    private Integer      id;
-    @Column( name = "name" )
-    private String       name;
-    @OneToMany
-    private List<Answer> answers;
-    @ManyToOne
-    @JoinColumn( name = "survey_id", referencedColumnName = "id" )
-    private Survey survey;
-
-    public Question(){
-    }
-
+    @Column( name = "id", nullable = false )
     public Integer getId(){
         return id;
     }
@@ -28,6 +20,8 @@ public class Question{
         this.id = id;
     }
 
+    @Basic
+    @Column( name = "name", nullable = false, length = 255 )
     public String getName(){
         return name;
     }
@@ -36,19 +30,27 @@ public class Question{
         this.name = name;
     }
 
-    public List<Answer> getAnswers(){
-        return answers;
+    @Override
+    public boolean equals( Object o ){
+        if( this == o )
+            return true;
+        if( o == null || getClass() != o.getClass() )
+            return false;
+
+        Question question = ( Question ) o;
+
+        if( id != null ? !id.equals( question.id ) : question.id != null )
+            return false;
+        if( name != null ? !name.equals( question.name ) : question.name != null )
+            return false;
+
+        return true;
     }
 
-    public void setAnswers( List<Answer> answers ){
-        this.answers = answers;
-    }
-
-    public Survey getSurvey(){
-        return survey;
-    }
-
-    public void setSurvey( Survey survey ){
-        this.survey = survey;
+    @Override
+    public int hashCode(){
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + ( name != null ? name.hashCode() : 0 );
+        return result;
     }
 }

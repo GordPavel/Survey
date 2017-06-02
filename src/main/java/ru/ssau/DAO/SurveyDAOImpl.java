@@ -1,23 +1,26 @@
 package ru.ssau.DAO;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ssau.domain.Survey;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 @Transactional
 @Repository
 public class SurveyDAOImpl implements SurveyDAO{
 
     @Autowired
-    private EntityManagerFactory entityManagerFactory;
+    private SessionFactory sessionFactory;
+
+    protected Session getSession(){
+        return this.sessionFactory.getCurrentSession();
+    }
 
     @Override
-    public Survey createNewSurvey( Survey survey ){
-        return null;
+    public void createNewSurvey( Survey survey ){
+        getSession().save( survey );
     }
 
     @Override
@@ -31,12 +34,7 @@ public class SurveyDAOImpl implements SurveyDAO{
     }
 
     @Override
-    public Survey getById( Integer integer ){
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        entityManager.getTransaction().begin();
-        Survey survey = entityManager.find( Survey.class, 1 );
-        entityManager.getTransaction().commit();
-        entityManager.close();
-        return survey;
+    public Survey getById( Integer id ){
+        return getSession().find( Survey.class, id );
     }
 }

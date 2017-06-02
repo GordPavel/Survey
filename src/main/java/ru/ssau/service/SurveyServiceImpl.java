@@ -1,5 +1,6 @@
 package ru.ssau.service;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.ssau.DAO.SurveyDAO;
@@ -24,7 +25,7 @@ public class SurveyServiceImpl implements SurveyService{
 
     @Override
     public void saveSurvey( Survey survey ){
-
+        surveyDAO.createNewSurvey( survey );
     }
 
     @Override

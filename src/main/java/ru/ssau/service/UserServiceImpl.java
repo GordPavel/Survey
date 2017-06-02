@@ -8,7 +8,8 @@ import ru.ssau.service.filesmanager.FilesManager;
 import ru.ssau.transport.UserRegistrationForm;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -33,7 +34,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void saveUser( UserRegistrationForm userRegistrationForm ) throws IOException{
-        return ;
+        return;
     }
 
     @Override

@@ -1,19 +1,30 @@
 package ru.ssau.domain;
 
+import javax.persistence.*;
 import java.util.List;
 
+@Entity
 public class User{
+    @Id
+    @Column( name = "login", nullable = false, length = 32 )
+    private String       login;
+    @Basic
+    @Column( name = "password", nullable = false, length = 256 )
+    private String       password;
+    @Basic
+    @Column( name = "name", length = 45 )
+    private String       name;
+    @Basic
+    @Column( name = "lastName", length = 45 )
+    private String       lastName;
+    @Enumerated( EnumType.STRING )
+    @Column( name = "Role_name" )
+    private Role         userRole;
+    @OneToMany
+    private List<Survey> surveysMade;
 
-    private String           login;
-    private String           password;
-    private String           name;
-    private String           lastName;
-    private UserRole         role;
+    @OneToMany
     private List<UserAnswer> answers;
-    private List<Survey>     created;
-
-    public User(){
-    }
 
     public String getLogin(){
         return login;
@@ -27,12 +38,13 @@ public class User{
         return password;
     }
 
-    public void setPassword( String password ){
-        this.password = password;
-    }
 
     public String getName(){
         return name;
+    }
+
+    public void setPassword( String password ){
+        this.password = password;
     }
 
     public void setName( String name ){
@@ -47,12 +59,13 @@ public class User{
         this.lastName = lastName;
     }
 
-    public UserRole getRole(){
-        return role;
+
+    public List<Survey> getSurveysMade(){
+        return surveysMade;
     }
 
-    public void setRole( UserRole role ){
-        this.role = role;
+    public void setSurveysMade( List<Survey> surveysMade ){
+        this.surveysMade = surveysMade;
     }
 
     public List<UserAnswer> getAnswers(){
@@ -63,11 +76,41 @@ public class User{
         this.answers = answers;
     }
 
-    public List<Survey> getCreated(){
-        return created;
+    @Override
+    public boolean equals( Object o ){
+        if( this == o )
+            return true;
+        if( o == null || getClass() != o.getClass() )
+            return false;
+
+        User user = ( User ) o;
+
+        if( login != null ? !login.equals( user.login ) : user.login != null )
+            return false;
+        if( password != null ? !password.equals( user.password ) : user.password != null )
+            return false;
+        if( name != null ? !name.equals( user.name ) : user.name != null )
+            return false;
+        if( lastName != null ? !lastName.equals( user.lastName ) : user.lastName != null )
+            return false;
+
+        return true;
     }
 
-    public void setCreated( List<Survey> created ){
-        this.created = created;
+    @Override
+    public int hashCode(){
+        int result = login != null ? login.hashCode() : 0;
+        result = 31 * result + ( password != null ? password.hashCode() : 0 );
+        result = 31 * result + ( name != null ? name.hashCode() : 0 );
+        result = 31 * result + ( lastName != null ? lastName.hashCode() : 0 );
+        return result;
+    }
+
+    public Role getUserRole(){
+        return userRole;
+    }
+
+    public void setUserRole( Role roleByRoleName ){
+        this.userRole = roleByRoleName;
     }
 }

@@ -9,10 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.ssau.config.WebAppConfig;
-import ru.ssau.domain.Survey;
 import ru.ssau.service.SurveyService;
-
-import static com.sun.xml.internal.ws.dump.LoggingDumpTube.Position.Before;
 
 @RunWith( SpringJUnit4ClassRunner.class )
 @ContextConfiguration( classes = WebAppConfig.class )
@@ -35,9 +32,14 @@ public class ClientControllerTest{
         mockMvc = MockMvcBuilders.webAppContextSetup( webApplicationContext ).build();
     }
 
+//    @Test
+//    public void showAllSurveys(){
+//        surveyService.getTop().stream().map( Survey::getName ).forEach( System.out::println );
+//    }
+
     @Test
-    public void showAllSurveys(){
-        surveyService.getTop().stream().map( Survey::getName ).forEach( System.out::println );
+    public void getSurveyById(){
+        System.out.println( surveyService.getSurveyById( 1 ).get() );
     }
 
 }

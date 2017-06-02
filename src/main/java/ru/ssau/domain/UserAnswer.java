@@ -1,51 +1,50 @@
 package ru.ssau.domain;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.persistence.*;
 
-import java.io.IOException;
-import java.util.List;
+@Entity
+@Table( name = "user_has_survey", schema = "survey" )
+@AssociationOverrides( { @AssociationOverride( name = "pk.user", joinColumns = @JoinColumn( name = "user_login" ) ) ,
+                         @AssociationOverride( name = "pk.survey", joinColumns = @JoinColumn( name = "survey_idsurvey" ) ) } )
+public class UserAnswer{
 
-class UserAnswer{
-    private Survey survey;
-    private User   user;
-    private String answers;
+    @EmbeddedId
+    private UserAnswerPK pk = new UserAnswerPK();
+    @Basic
+    @Column( name = "userAnswer" )
+    private String userAnswer;
 
-    public UserAnswer(){
+    public UserAnswerPK getPk(){
+        return pk;
     }
 
-    public Survey getSurvey(){
-        return survey;
+    public void setPk( UserAnswerPK pk ){
+        this.pk = pk;
     }
 
-    public void setSurvey( Survey survey ){
-        this.survey = survey;
+    public String getUserAnswer(){
+        return userAnswer;
     }
 
+    public void setUserAnswer( String userAnswer ){
+        this.userAnswer = userAnswer;
+    }
+
+    @Transient
     public User getUser(){
-        return user;
+        return getPk().getUser();
     }
 
     public void setUser( User user ){
-        this.user = user;
+        this.getPk().setUser( user );
     }
 
-    public String getAnswers(){
-        return answers;
+    @Transient
+    public Survey getSurvey(){
+        return getPk().getSurvey();
     }
 
-    public void setAnswers( String answers ){
-        this.answers = answers;
-    }
-
-    public List<Integer> getListAnswers() throws IOException{
-        return new ObjectMapper().readValue( this.answers, new TypeReference<List<Integer>>(){
-        } );
-    }
-
-    public void setAnswers( List<Integer> list ) throws JsonProcessingException{
-        // TODO: 01.06.17 Проверки
-        this.answers = new ObjectMapper().writeValueAsString( list );
+    public void setSurvey( Survey survey ){
+        this.getPk().setSurvey( survey );
     }
 }
