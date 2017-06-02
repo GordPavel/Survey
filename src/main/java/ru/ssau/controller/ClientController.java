@@ -1,6 +1,7 @@
 package ru.ssau.controller;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -82,7 +83,7 @@ public class ClientController{
       @RequestMapping( value = "/user/doneSurveys", method = RequestMethod.GET )
     public ResponseEntity<?> getDoneSurveysByLogin( @RequestParam String login ){
         return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 )
-            .body( userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ) ).getDoneSurveys() );
+            .body( new ObjectMapper().writeValueAsString( userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ) ).getDoneSurveys() ) );
     }
 
 
