@@ -20,10 +20,9 @@ public class User{
     @Enumerated( EnumType.STRING )
     @Column( name = "Role_name" )
     private Role         userRole;
-    @OneToMany
+    @OneToMany( fetch = FetchType.LAZY, mappedBy = "creator" )
     private List<Survey> surveysMade;
-
-    @OneToMany
+    @OneToMany( fetch = FetchType.LAZY, mappedBy = "pk.user" )
     private List<UserAnswer> answers;
 
     public String getLogin(){

@@ -26,12 +26,15 @@ public class Survey{
     @JoinColumn( name = "topic_name", referencedColumnName = "name" )
     private Topic topic;
 
-    @OneToMany
+    @OneToMany( fetch = FetchType.LAZY , mappedBy = "pk.survey" )
     private List<UserAnswer> answers;
 
     @ManyToOne
     @JoinColumn( name = "userMade", referencedColumnName = "login" )
     private User creator;
+
+    @OneToMany( fetch = FetchType.EAGER, mappedBy = "survey" )
+    private List<Question> questions;
 
     public Integer getId(){
         return id;
@@ -91,6 +94,18 @@ public class Survey{
 
     public void setCreator( User creator ){
         this.creator = creator;
+    }
+
+    public void setDate( Date date ){
+        this.date = date;
+    }
+
+    public List<Question> getQuestions(){
+        return questions;
+    }
+
+    public void setQuestions( List<Question> questions ){
+        this.questions = questions;
     }
 
     @Override

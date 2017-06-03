@@ -1,6 +1,9 @@
 package ru.ssau.DAO;
 
 import ru.ssau.domain.Survey;
+import ru.ssau.domain.User;
+
+import java.util.List;
 
 public interface SurveyDAO{
 
@@ -11,4 +14,8 @@ public interface SurveyDAO{
     void updateSurvey( Survey survey );
 
     Survey getById( Integer integer );
+
+    List<Survey> getAll();
+
+    public User getMadeByUser( Integer id );
 }

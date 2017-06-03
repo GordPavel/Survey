@@ -1,17 +1,21 @@
 package ru.ssau.domain;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Answer{
-    private Integer id;
-    private String name;
-
     @Id
     @Column( name = "id", nullable = false )
+    @GeneratedValue( strategy = GenerationType.AUTO )
+    private Integer id;
+    @Basic
+    @Column( name = "name", nullable = false, length = 45 )
+    private String  name;
+
+    @ManyToOne
+    @JoinColumn( name = "question_id", referencedColumnName = "id" )
+    private Question question;
+
     public Integer getId(){
         return id;
     }
@@ -20,14 +24,20 @@ public class Answer{
         this.id = id;
     }
 
-    @Basic
-    @Column( name = "name", nullable = false, length = 45 )
     public String getName(){
         return name;
     }
 
     public void setName( String name ){
         this.name = name;
+    }
+
+    public Question getQuestion(){
+        return question;
+    }
+
+    public void setQuestion( Question question ){
+        this.question = question;
     }
 
     @Override

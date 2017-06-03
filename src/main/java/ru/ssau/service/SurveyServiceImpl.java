@@ -35,7 +35,7 @@ public class SurveyServiceImpl implements SurveyService{
 
     @Override
     public List<Survey> getTop(){
-        return null;
+        return surveyDAO.getAll();
     }
 
     @Override

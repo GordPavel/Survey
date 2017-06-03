@@ -1,6 +1,7 @@
 package ru.ssau.domain;
 
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
 
@@ -8,9 +9,11 @@ import java.io.Serializable;
 public class UserAnswerPK implements Serializable{
 
     @ManyToOne
+    @JoinColumn( name = "user_login", referencedColumnName = "login" )
     private User user;
 
     @ManyToOne
+    @JoinColumn( name = "survey_idsurvey", referencedColumnName = "id" )
     private Survey survey;
 
     public User getUser(){
