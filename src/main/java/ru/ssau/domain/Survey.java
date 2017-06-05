@@ -1,15 +1,19 @@
 package ru.ssau.domain;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
 
 @Entity
 public class Survey{
     @Id
-    @GeneratedValue( strategy = GenerationType.AUTO )
-    @Column( name = "id" )
+    @GeneratedValue( strategy = GenerationType.IDENTITY )
+    @Column( name = "id", nullable = false, unique = true )
     private Integer id;
     @Basic
     @Column( name = "comment" )
@@ -18,23 +22,24 @@ public class Survey{
     @Basic
     @Column( name = "name", nullable = false, length = 45 )
     private String name;
-    @Temporal( TemporalType.DATE )
+
+    @Temporal( TemporalType.TIMESTAMP )
     @Column( name = "madeTime" )
-    private Date   date;
+    private Date date;
 
     @ManyToOne
     @JoinColumn( name = "topic_name", referencedColumnName = "name" )
     private Topic topic;
 
-    @OneToMany( fetch = FetchType.LAZY , mappedBy = "pk.survey" )
-    private List<UserAnswer> answers;
-
     @ManyToOne
     @JoinColumn( name = "userMade", referencedColumnName = "login" )
     private User creator;
 
-    @OneToMany( fetch = FetchType.EAGER, mappedBy = "survey" )
+    @OneToMany( fetch = FetchType.LAZY, mappedBy = "survey", cascade = CascadeType.ALL )
     private List<Question> questions;
+
+    @Transient
+    private Integer usersAnswered;
 
     public Integer getId(){
         return id;
@@ -64,8 +69,8 @@ public class Survey{
         return date;
     }
 
-    public void setDate( Timestamp madeTime ){
-        this.date = madeTime;
+    public void setDate( Date date ){
+        this.date = date;
     }
 
     public Topic getTopic(){
@@ -76,16 +81,12 @@ public class Survey{
         this.topic = topic;
     }
 
-    public Integer getUsersDone(){
-        return getAnswers().size();
+    public Integer getUsersAnswered(){
+        return usersAnswered;
     }
 
-    public List<UserAnswer> getAnswers(){
-        return answers;
-    }
-
-    public void setAnswers( List<UserAnswer> answers ){
-        this.answers = answers;
+    public void setUsersAnswered( List<UserAnswer> list ){
+        this.usersAnswered = list.size();
     }
 
     public User getCreator(){
@@ -96,16 +97,28 @@ public class Survey{
         this.creator = creator;
     }
 
-    public void setDate( Date date ){
-        this.date = date;
-    }
-
     public List<Question> getQuestions(){
         return questions;
     }
 
     public void setQuestions( List<Question> questions ){
         this.questions = questions;
+    }
+
+    public void setAnswers( List<UserAnswer> list ){
+        this.usersAnswered = list.size();
+        list.stream().map( ( Function<UserAnswer, List<Integer>> ) answer -> {
+            try{
+                return new ObjectMapper().readValue( answer.getUserAnswer(), new TypeReference<List<Integer>>(){
+                } );
+            }catch( IOException e ){
+                throw new IllegalArgumentException( "Ошибка деериализации ответов на анкету" );
+            }
+        } ).forEach( integers -> {
+            for( int i = 0, end = this.getQuestions().size() ; i < end ; i++ ){
+                this.getQuestions().get( i ).getAnswers().get( integers.get( i ) - 1 ).incrementUsersAnswered();
+            }
+        } );
     }
 
     @Override

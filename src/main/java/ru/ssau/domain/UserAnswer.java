@@ -5,7 +5,7 @@ import javax.persistence.*;
 @Entity
 @Table( name = "user_has_survey", schema = "survey" )
 @AssociationOverrides( { @AssociationOverride( name = "pk.user", joinColumns = @JoinColumn( name = "user_login" ) ) ,
-                         @AssociationOverride( name = "pk.survey", joinColumns = @JoinColumn( name = "survey_idsurvey" ) ) } )
+                         @AssociationOverride( name = "pk.survey", joinColumns = @JoinColumn( name = "survey_idsurvey" ) ) }  )
 public class UserAnswer{
 
     @EmbeddedId

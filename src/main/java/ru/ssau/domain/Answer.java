@@ -4,17 +4,22 @@ import javax.persistence.*;
 
 @Entity
 public class Answer{
+
     @Id
-    @Column( name = "id", nullable = false )
-    @GeneratedValue( strategy = GenerationType.AUTO )
+    @Column( name = "id", nullable = false, unique = true )
+    @GeneratedValue( strategy = GenerationType.IDENTITY )
     private Integer id;
+
     @Basic
     @Column( name = "name", nullable = false, length = 45 )
-    private String  name;
+    private String name;
 
     @ManyToOne
     @JoinColumn( name = "question_id", referencedColumnName = "id" )
     private Question question;
+
+    @Transient
+    private Integer usersAnswered = 0;
 
     public Integer getId(){
         return id;
@@ -40,6 +45,14 @@ public class Answer{
         this.question = question;
     }
 
+    public Integer getUsersAnswered(){
+        return usersAnswered;
+    }
+
+    public void incrementUsersAnswered(){
+        this.usersAnswered++;
+    }
+
     @Override
     public boolean equals( Object o ){
         if( this == o )
@@ -62,5 +75,10 @@ public class Answer{
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + ( name != null ? name.hashCode() : 0 );
         return result;
+    }
+
+    @Override
+    public String toString(){
+        return super.toString() + " " + getName();
     }
 }

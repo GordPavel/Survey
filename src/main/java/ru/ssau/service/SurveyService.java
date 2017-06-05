@@ -2,22 +2,21 @@ package ru.ssau.service;
 
 import ru.ssau.domain.Survey;
 import ru.ssau.domain.Topic;
-import ru.ssau.domain.User;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface SurveyService{
 
-    List<Survey> getTop();
+    List<Survey> getTop( String orderedBy, Integer limit );
 
     Optional<Survey> getSurveyById( Integer id );
 
-    Optional<User> getMadeUser( Integer id );
-
-    Optional<Topic> getCategoryByName( String name );
-
-    List<Topic> getCategories();
-
     void saveSurvey( Survey survey );
+
+    void deleteSurvey( Survey survey );
+
+    List<Topic> topics( String orderedBy, Integer limit );
+
+    Optional<Topic> getTopicByName( String name );
 }

@@ -6,8 +6,8 @@ import java.util.List;
 @Entity
 public class Question{
     @Id
-    @Column( name = "id", nullable = false )
-    @GeneratedValue( strategy = GenerationType.AUTO )
+    @Column( name = "id", nullable = false , unique = true )
+    @GeneratedValue( strategy = GenerationType.IDENTITY )
     private Integer id;
 
     @Basic
@@ -18,7 +18,7 @@ public class Question{
     @JoinColumn( name = "survey_id", referencedColumnName = "id" )
     private Survey survey;
 
-    @OneToMany( fetch = FetchType.EAGER, mappedBy = "question" )
+    @OneToMany( fetch = FetchType.EAGER, mappedBy = "question", cascade = CascadeType.ALL )
     private List<Answer> answers;
 
     public Integer getId(){
@@ -75,5 +75,10 @@ public class Question{
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + ( name != null ? name.hashCode() : 0 );
         return result;
+    }
+
+    @Override
+    public String toString(){
+        return super.toString() + " " + getName();
     }
 }

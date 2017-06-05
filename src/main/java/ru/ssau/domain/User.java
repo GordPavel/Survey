@@ -2,11 +2,12 @@ package ru.ssau.domain;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class User{
     @Id
-    @Column( name = "login", nullable = false, length = 32 )
+    @Column( name = "login", nullable = false, length = 32, unique = true )
     private String       login;
     @Basic
     @Column( name = "password", nullable = false, length = 256 )
@@ -20,10 +21,11 @@ public class User{
     @Enumerated( EnumType.STRING )
     @Column( name = "Role_name" )
     private Role         userRole;
-    @OneToMany( fetch = FetchType.LAZY, mappedBy = "creator" )
+    @OneToMany( fetch = FetchType.EAGER, mappedBy = "creator", cascade = CascadeType.ALL )
     private List<Survey> surveysMade;
-    @OneToMany( fetch = FetchType.LAZY, mappedBy = "pk.user" )
-    private List<UserAnswer> answers;
+
+    @Transient
+    private List<Survey> surveysDone;
 
     public String getLogin(){
         return login;
@@ -36,7 +38,6 @@ public class User{
     public String getPassword(){
         return password;
     }
-
 
     public String getName(){
         return name;
@@ -58,7 +59,6 @@ public class User{
         this.lastName = lastName;
     }
 
-
     public List<Survey> getSurveysMade(){
         return surveysMade;
     }
@@ -67,12 +67,12 @@ public class User{
         this.surveysMade = surveysMade;
     }
 
-    public List<UserAnswer> getAnswers(){
-        return answers;
+    public List<Survey> getSurveysDone(){
+        return surveysDone;
     }
 
-    public void setAnswers( List<UserAnswer> answers ){
-        this.answers = answers;
+    public void setSurveysDone( List<UserAnswer> surveysDone ){
+        this.surveysDone = surveysDone.stream().map( UserAnswer::getSurvey ).collect( Collectors.toList() );
     }
 
     @Override

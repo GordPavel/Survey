@@ -10,17 +10,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.ssau.domain.Survey;
-import ru.ssau.exceptions.CategoryNotFoundException;
 import ru.ssau.service.SurveyService;
 import ru.ssau.service.UserService;
 import ru.ssau.service.validation.UserRegistrationValidator;
 import ru.ssau.transport.UserRegistrationForm;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping( "/" )
@@ -38,14 +34,7 @@ public class WebController{
     @RequestMapping( method = RequestMethod.GET )
     public String start( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
                          @RequestParam( required = false, defaultValue = "5" ) Integer limit, Model model ){
-        if( sortBy.equals( "users" ) ){
-            model.addAttribute( "surveys", surveyService.getTop().stream().sorted(
-                    Comparator.comparingInt( Survey::getUsersDone ) ).limit( limit ).collect( Collectors.toList() ) );
-        }else if( sortBy.equals( "time" ) ){
-            model.addAttribute( "surveys", surveyService.getTop().stream().sorted(
-                    Comparator.comparingLong( ( survey ) -> survey.getDate().getTime() ) ).limit( limit ).collect(
-                    Collectors.toList() ) );
-        }
+        model.addAttribute( "surveys", surveyService.getTop( sortBy, limit ) );
         return "index";
     }
 
@@ -68,22 +57,13 @@ public class WebController{
     @RequestMapping( value = "/topics", method = RequestMethod.GET )
     public String topics( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
                           @RequestParam( required = false, defaultValue = "3" ) Integer limit, Model model ){
-        if( sortBy.equals( "users" ) )
-            model.addAttribute( "topics", surveyService.getCategories().stream().peek( category -> category.setSurveys(
-                    category.getSurveys().stream().sorted( Comparator.comparingInt( Survey::getUsersDone ) ).limit(
-                            limit ).collect( Collectors.toList() ) ) ).collect( Collectors.toList() ) );
-        else if( sortBy.equals( "time" ) )
-            model.addAttribute( "topics", surveyService.getCategories().stream().peek( category -> category.setSurveys(
-                    category.getSurveys().stream().sorted(
-                            Comparator.comparingLong( ( survey ) -> survey.getDate().getTime() ) ).limit(
-                            limit ).collect( Collectors.toList() ) ) ).collect( Collectors.toList() ) );
+        model.addAttribute( "topics", surveyService.topics( sortBy, limit ) );
         return "topics";
     }
 
     @RequestMapping( value = "/topic", method = RequestMethod.GET )
     public String topic( @RequestParam String name, Model model ){
-        model.addAttribute( "topic", surveyService.getCategoryByName( name ).orElseThrow(
-                () -> new CategoryNotFoundException( name ) ) );
+        model.addAttribute( "topic", surveyService.getTopicByName( name ) );
         return "topic";
     }
 
