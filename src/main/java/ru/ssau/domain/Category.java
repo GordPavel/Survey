@@ -11,9 +11,7 @@ public class Category{
         return name;
     }
 
-    public Category( String name, List<Survey> surveys ){
-        this.name = name;
-        this.surveys = surveys;
+    public Category(){
     }
 
     public void setName( String name ){

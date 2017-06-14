@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.List;
 
-class UserAnswer{
+public class UserAnswer{
     private Survey survey;
     private User   user;
     private String answers;
@@ -32,8 +32,7 @@ class UserAnswer{
     }
 
     public List<Integer> getAnswers() throws IOException{
-        return new ObjectMapper().readValue( this.answers, new TypeReference<List<Integer>>(){
-        } );
+        return new ObjectMapper().readValue( this.answers, new TypeReference<List<Integer>>(){} );
     }
 
     public void setAnswers( List<Integer> answers ) throws JsonProcessingException{

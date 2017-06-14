@@ -4,13 +4,13 @@ import java.util.List;
 
 public class User{
 
-    private String       login;
-    private String       password;
-    private String       name;
-    private String       lastName;
-    private UserRoles    role;
-    private List<Survey> doneSurveys;
-    private List<Survey> madeSurveys;
+    private String           login;
+    private String           password;
+    private String           name;
+    private String           lastName;
+    private UserRoles        role;
+    private List<UserAnswer> answers;
+    private List<Survey>     madeSurveys;
 
     public User(){
     }
@@ -31,22 +31,6 @@ public class User{
         this.name = name;
         this.lastName = lastName;
         this.role = role;
-    }
-
-    public List<Survey> getDoneSurveys(){
-        return doneSurveys;
-    }
-
-    public void setDoneSurveys( List<Survey> doneSurveys ){
-        this.doneSurveys = doneSurveys;
-    }
-
-    public List<Survey> getMadeSurveys(){
-        return madeSurveys;
-    }
-
-    public void setMadeSurveys( List<Survey> madeSurveys ){
-        this.madeSurveys = madeSurveys;
     }
 
     public String getLogin(){
@@ -87,5 +71,21 @@ public class User{
 
     public void setRole( UserRoles role ){
         this.role = role;
+    }
+
+    public List<UserAnswer> getAnswers(){
+        return answers;
+    }
+
+    public void setAnswers( List<UserAnswer> answers ){
+        this.answers = answers;
+    }
+
+    public List<Survey> getMadeSurveys(){
+        return madeSurveys;
+    }
+
+    public void setMadeSurveys( List<Survey> madeSurveys ){
+        this.madeSurveys = madeSurveys;
     }
 }

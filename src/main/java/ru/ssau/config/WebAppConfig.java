@@ -15,6 +15,8 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 import ru.ssau.service.UserDetailsServiceImpl;
 
+import java.util.concurrent.Semaphore;
+
 @Configuration
 @EnableWebMvc
 @PropertySource( "classpath:app.properties" )
@@ -54,6 +56,14 @@ public class WebAppConfig extends WebMvcConfigurerAdapter{
         messageSource.setDefaultEncoding( "UTF-8" );
         messageSource.setBasename( "messages" );
         return messageSource;
+    }
+
+
+    private Semaphore semaphore = new Semaphore( 50, true );
+
+    @Bean
+    public Semaphore semaphore(){
+        return semaphore;
     }
 }
 

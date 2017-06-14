@@ -1,6 +1,7 @@
 package ru.ssau.controller;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -57,18 +58,17 @@ public class ClientController{
             return surveyService.getTop().stream().sorted( Comparator.comparingInt( Survey::getUsersDone ) ).limit(
                     limit ).map( survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect(
                     Collectors.toList() );
-        else
-            return surveyService.getTop().stream().sorted(
-                    Comparator.comparingLong( ( survey ) -> survey.getDate().getTime() ) ).limit( limit ).map(
-                    survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect( Collectors.toList() );
+        else return surveyService.getTop().stream().sorted(
+                Comparator.comparingLong( ( survey ) -> survey.getDate().getTime() ) ).limit( limit ).map(
+                survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect( Collectors.toList() );
     }
 
     @RequestMapping( value = "/survey", method = RequestMethod.GET )
     public ResponseEntity<?> getSurveyById( @RequestParam Integer id ){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType( MediaType.APPLICATION_JSON_UTF8 );
-        return ResponseEntity.accepted().headers( headers ).body(
-                surveyService.getSurveyById( id ).orElseThrow( () -> new SurveyNotFoundException( id ) ) );
+        Survey survey = surveyService.getSurveyById( id ).orElseThrow( () -> new SurveyNotFoundException( id ) );
+        return ResponseEntity.accepted().headers( headers ).body( survey );
     }
 
     @RequestMapping( value = "/user", method = RequestMethod.GET )
@@ -78,19 +78,18 @@ public class ClientController{
         return ResponseEntity.accepted().headers( headers ).body(
                 userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ) ) );
     }
-    
-      @RequestMapping( value = "/user/doneSurveys", method = RequestMethod.GET )
-    public ResponseEntity<?> getDoneSurveysByLogin( @RequestParam String login ){
-        return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 )
-            .body( userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ) ).getDoneSurveys() );
-    }
 
+    @RequestMapping( value = "/user/doneSurveys", method = RequestMethod.GET )
+    public ResponseEntity<?> getSurveysDoneByUser( @RequestParam String login ) throws JsonProcessingException{
+        return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
+                new ObjectMapper().writeValueAsString( ( userService.getUser( login ).orElseThrow(
+                        () -> new UsernameNotFoundException( login ) ).getAnswers() ) ) );
+    }
 
     @RequestMapping( value = "/login", method = RequestMethod.POST )
     public ResponseEntity<?> login( @RequestParam String login, @RequestParam String password ){
         Optional<User> userOptional = userService.getUser( login );
-        if( !userOptional.isPresent() )
-            return ResponseEntity.notFound().build();
+        if( !userOptional.isPresent() ) return ResponseEntity.notFound().build();
         User user = userOptional.get();
         if( !user.getPassword().equals( passwordEncoder.encodePassword( password, null ) ) )
             return ResponseEntity.badRequest().build();
@@ -103,25 +102,18 @@ public class ClientController{
         if( validator.validate( user ) ){
             userService.saveUser( user );
             return ResponseEntity.ok().build();
-        }else
-            return ResponseEntity.badRequest().build();
+        }else return ResponseEntity.badRequest().build();
     }
 
     @RequestMapping( value = "/topics", method = RequestMethod.GET )
     public ResponseEntity<?> topics( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
                                      @RequestParam( required = false, defaultValue = "3" ) Integer limit ){
         List<TopicTransport> list;
-        if( sortBy.equals( "users" ) )
-            list = surveyService.getCategories().stream().map( category -> new TopicTransport( category.getName(),
-                                                                                               category.getSurveys().stream().sorted(
-                                                                                                       Comparator.comparingInt(
-                                                                                                               Survey::getUsersDone ) ).limit(
-                                                                                                       limit ).map(
-                                                                                                       survey -> new SurveyTransport(
-                                                                                                               survey.getId(),
-                                                                                                               survey.getName() ) ).collect(
-                                                                                                       Collectors.toList() ) ) ).collect(
-                    Collectors.toList() );
+        if( sortBy.equals( "users" ) ) list = surveyService.getCategories().stream().map(
+                category -> new TopicTransport( category.getName(), category.getSurveys().stream().sorted(
+                        Comparator.comparingInt( Survey::getUsersDone ) ).limit( limit ).map(
+                        survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect(
+                        Collectors.toList() ) ) ).collect( Collectors.toList() );
         else{
             list = surveyService.getCategories().stream().map( category -> new TopicTransport( category.getName(),
                                                                                                category.getSurveys().stream().sorted(
@@ -149,10 +141,9 @@ public class ClientController{
 
 
     @RequestMapping( value = "/doneSurvey", method = RequestMethod.POST )
-    public void doneSurvey( @RequestParam String answers, @RequestParam Integer id, @RequestParam String login ) throws
-                                                                                                                 IOException{
-        List<Integer> listAnswers = new ObjectMapper().readValue( answers, new TypeReference<List<Integer>>(){
-        } );
+    public void doneSurvey( @RequestParam String answers, @RequestParam Integer id, @RequestParam String login )
+            throws IOException{
+        List<Integer> listAnswers = new ObjectMapper().readValue( answers, new TypeReference<List<Integer>>(){} );
         Survey survey = surveyService.getSurveyById( id ).get();
         User   user   = userService.getUser( login ).get();
         return;

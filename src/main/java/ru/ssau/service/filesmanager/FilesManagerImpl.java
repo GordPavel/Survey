@@ -15,25 +15,24 @@ import static java.nio.file.Paths.get;
 @Service
 public class FilesManagerImpl implements FilesManager{
 
-
     @Autowired
     private Environment environment;
 
     @Override
     public MyFile getFile( String location ) throws IOException{
-        return new MyFile( readAllBytes( get( environment.getProperty( "storage" ) + location ) ) );
+        return new MyFile( readAllBytes( get( environment.getProperty( "filesStorage" ) + location ) ) );
     }
 
     @Override
     public boolean saveFile( byte[] file, String location ) throws IOException{
         deleteFile( location );
-        write( createFile( get( environment.getProperty( "storage" ) + location + ".png" ) ), file );
+        write( createFile( get( environment.getProperty( "filesStorage" ) + location + ".png" ) ), file );
         return true;
     }
 
     @Override
     public boolean deleteFile( String location ) throws IOException{
-        Path path = Paths.get( environment.getProperty( "storage" ) + location + ".png" );
+        Path path = Paths.get( environment.getProperty( "filesStorage" ) + location + ".png" );
         if( Files.exists( path ) )
             Files.delete( path );
         return true;

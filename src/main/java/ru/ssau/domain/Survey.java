@@ -1,7 +1,5 @@
 package ru.ssau.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.Date;
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -10,13 +8,14 @@ import java.util.stream.Stream;
 
 public class Survey{
 
-    private Integer        id;
-    private String         name;
-    private String         comment;
-    private List<User>     users;
-    private List<Question> questions;
-    private User           madeByUser;
-    private Date           date;
+    private Integer          id;
+    private String           name;
+    private String           comment;
+    private List<UserAnswer> answers;
+    private List<Question>   questions;
+    private User             creator;
+    private Date             date;
+    private Category         category;
 
     public Date getDate(){
         return date;
@@ -28,30 +27,6 @@ public class Survey{
 
     public Survey(){
     }
-
-    public Survey( Integer id ){
-        this.id = id;
-        name = "survey" + id;
-        comment = "test";
-        users = Stream.iterate( new User( "login" + 1 ), new UnaryOperator<User>(){
-            int i = 1;
-
-            @Override
-            public User apply( User t ){
-                return new User( "login" + ( ++i ) );
-            }
-        } ).limit( ( int ) ( 1 + ( long ) ( Math.random() * ( 6 - 1 ) ) ) ).collect( Collectors.toList() );
-        questions = Stream.iterate( new Question( 1 ), new UnaryOperator<Question>(){
-            int i = 1;
-
-            @Override
-            public Question apply( Question t ){
-                return new Question( ++i );
-            }
-        } ).limit( ( int ) ( 1 + ( long ) ( Math.random() * ( 6 - 1 ) ) ) ).collect( Collectors.toList() );
-        madeByUser = users.get( 0 );
-    }
-
 
     public Integer getId(){
         return id;
@@ -85,24 +60,32 @@ public class Survey{
         this.comment = comment;
     }
 
-    public void setUsers( List<User> users ){
-        this.users = users;
+    public List<UserAnswer> getAnswers(){
+        return answers;
     }
 
-    public List<User> getUsers(){
-        return users;
-    }
-
-    @JsonIgnore
     public Integer getUsersDone(){
-        return users.size();
+        if( answers == null ) throw new IllegalArgumentException( "Ответы не загружены" );
+        return answers.size();
     }
 
-    public User getMadeByUser(){
-        return madeByUser;
+    public void setAnswers( List<UserAnswer> answers ){
+        this.answers = answers;
     }
 
-    public void setMadeByUser( User madeByUser ){
-        this.madeByUser = madeByUser;
+    public User getCreator(){
+        return creator;
+    }
+
+    public Category getCategory(){
+        return category;
+    }
+
+    public void setCategory( Category category ){
+        this.category = category;
+    }
+
+    public void setCreator( User creator ){
+        this.creator = creator;
     }
 }
