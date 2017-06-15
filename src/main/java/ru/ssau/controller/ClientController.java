@@ -78,11 +78,20 @@ public class ClientController{
                 userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ) ) );
     }
 
-    @RequestMapping( value = "/user/doneSurveys", method = RequestMethod.GET )
-    public ResponseEntity<?> getSurveysDoneByUser( @RequestParam String login ) throws JsonProcessingException{
-        return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
-                objectMapper.writeValueAsString( ( userService.getUser( login ).orElseThrow(
-                        () -> new UsernameNotFoundException( login ) ).getAnswers() ) ) );
+        @RequestMapping(value = {"/user/doneSurveys"}, method = {RequestMethod.GET})
+    public ResponseEntity<?> getDoneSurveysByLogin(@RequestParam String login) throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON_UTF8).body(
+                (new ObjectMapper()).writeValueAsString(((User)this.userService.getUser(login).orElseThrow(() -> {
+            return new UsernameNotFoundException(login);
+        })).getSurveysDone()));
+    }
+
+    @RequestMapping(value = {"/user/madeSurveys"}, method = {RequestMethod.GET})
+    public ResponseEntity<?> getMadeSurveysByLogin(@RequestParam String login) throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON_UTF8).body(
+                (new ObjectMapper()).writeValueAsString(((User)this.userService.getUser(login).orElseThrow(() -> {
+            return new UsernameNotFoundException(login);
+        })).getSurveysMade()));
     }
 
     @RequestMapping( value = "/login", method = RequestMethod.POST )
