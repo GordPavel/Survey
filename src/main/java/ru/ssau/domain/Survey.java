@@ -1,5 +1,7 @@
 package ru.ssau.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -64,6 +66,7 @@ public class Survey{
         return answers;
     }
 
+    @JsonIgnore
     public Integer getUsersDone(){
         if( answers == null ) throw new IllegalArgumentException( "Ответы не загружены" );
         return answers.size();

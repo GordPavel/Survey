@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.ssau.DAO.survey.DeserializeSurveyOptions;
 import ru.ssau.domain.Survey;
 import ru.ssau.exceptions.CategoryNotFoundException;
 import ru.ssau.service.SurveyService;
@@ -38,14 +39,7 @@ public class WebController{
     @RequestMapping( method = RequestMethod.GET )
     public String start( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
                          @RequestParam( required = false, defaultValue = "5" ) Integer limit, Model model ){
-        if( sortBy.equals( "users" ) ){
-            model.addAttribute( "surveys", surveyService.getTop().stream().sorted(
-                    Comparator.comparingInt( Survey::getUsersDone ) ).limit( limit ).collect( Collectors.toList() ) );
-        }else if( sortBy.equals( "time" ) ){
-            model.addAttribute( "surveys", surveyService.getTop().stream().sorted(
-                    Comparator.comparingLong( ( survey ) -> survey.getDate().getTime() ) ).limit( limit ).collect(
-                    Collectors.toList() ) );
-        }
+        model.addAttribute( "surveys", surveyService.getTop( sortBy, limit, DeserializeSurveyOptions.fromStrings() ) );
         return "index";
     }
 
@@ -57,26 +51,24 @@ public class WebController{
     @RequestMapping( value = "/login", method = RequestMethod.GET )
     public String signInPage( @RequestParam( value = "error", required = false ) String error,
                               @RequestParam( value = "logout", required = false ) String logout, Model model ){
-        if( error != null )
-            model.addAttribute( "error", messageSource.getMessage( "login.incorrectLoginOrPassword", new String[]{},
-                                                                   Locale.getDefault() ) );
-        if( logout != null )
-            model.addAttribute( "msg", "You've been logged out successfully." );
+        if( error != null ) model.addAttribute( "error", messageSource.getMessage( "login.incorrectLoginOrPassword",
+                                                                                   new String[]{},
+                                                                                   Locale.getDefault() ) );
+        if( logout != null ) model.addAttribute( "msg", "You've been logged out successfully." );
         return "login";
     }
 
     @RequestMapping( value = "/topics", method = RequestMethod.GET )
     public String topics( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
                           @RequestParam( required = false, defaultValue = "3" ) Integer limit, Model model ){
-        if( sortBy.equals( "users" ) )
-            model.addAttribute( "topics", surveyService.getCategories().stream().peek( category -> category.setSurveys(
-                    category.getSurveys().stream().sorted( Comparator.comparingInt( Survey::getUsersDone ) ).limit(
-                            limit ).collect( Collectors.toList() ) ) ).collect( Collectors.toList() ) );
-        else if( sortBy.equals( "time" ) )
-            model.addAttribute( "topics", surveyService.getCategories().stream().peek( category -> category.setSurveys(
-                    category.getSurveys().stream().sorted(
-                            Comparator.comparingLong( ( survey ) -> survey.getDate().getTime() ) ).limit(
-                            limit ).collect( Collectors.toList() ) ) ).collect( Collectors.toList() ) );
+        if( sortBy.equals( "users" ) ) model.addAttribute( "topics", surveyService.getCategories().stream().peek(
+                category -> category.setSurveys(
+                        category.getSurveys().stream().sorted( Comparator.comparingInt( Survey::getUsersDone ) ).limit(
+                                limit ).collect( Collectors.toList() ) ) ).collect( Collectors.toList() ) );
+        else if( sortBy.equals( "time" ) ) model.addAttribute( "topics", surveyService.getCategories().stream().peek(
+                category -> category.setSurveys( category.getSurveys().stream().sorted(
+                        Comparator.comparingLong( ( survey ) -> survey.getDate().getTime() ) ).limit( limit ).collect(
+                        Collectors.toList() ) ) ).collect( Collectors.toList() ) );
         return "topics";
     }
 
@@ -115,8 +107,7 @@ public class WebController{
     public String registration( @ModelAttribute( "userForm" ) UserRegistrationForm userForm,
                                 BindingResult bindingResult ){
         validator.validate( userForm, bindingResult );
-        if( bindingResult.hasErrors() )
-            return "registration";
+        if( bindingResult.hasErrors() ) return "registration";
         try{
             userService.saveUser( userForm );
         }catch( IOException e ){

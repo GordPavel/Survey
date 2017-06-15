@@ -1,5 +1,6 @@
 package ru.ssau.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -26,6 +27,11 @@ public class WebAppConfig extends WebMvcConfigurerAdapter{
     @Override
     public void addResourceHandlers( ResourceHandlerRegistry registry ){
         registry.addResourceHandler( "/pages/**" ).addResourceLocations( "/pages/" );
+    }
+
+    @Bean
+    public ObjectMapper objectMapper(){
+        return new ObjectMapper();
     }
 
     @Bean

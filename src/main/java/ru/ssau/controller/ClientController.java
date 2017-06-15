@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import ru.ssau.DAO.survey.DeserializeSurveyOptions;
 import ru.ssau.domain.Category;
 import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 @RequestMapping( value = "/client" )
 public class ClientController{
 
+
     @Autowired
     private SurveyService             surveyService;
     @Autowired
@@ -50,21 +52,18 @@ public class ClientController{
     private UserRegistrationValidator validator;
     @Autowired
     private ShaPasswordEncoder        passwordEncoder;
+    @Autowired
+    private ObjectMapper              objectMapper;
 
     @RequestMapping( value = "/topSurveys", method = RequestMethod.GET, headers = "Accept=application/json" )
-    public List<SurveyTransport> topSurveys( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
-                                             @RequestParam( required = false, defaultValue = "5" ) Integer limit ){
-        if( sortBy.equals( "users" ) )
-            return surveyService.getTop().stream().sorted( Comparator.comparingInt( Survey::getUsersDone ) ).limit(
-                    limit ).map( survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect(
-                    Collectors.toList() );
-        else return surveyService.getTop().stream().sorted(
-                Comparator.comparingLong( ( survey ) -> survey.getDate().getTime() ) ).limit( limit ).map(
-                survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect( Collectors.toList() );
+    public List<Survey> topSurveys( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
+                                    @RequestParam( required = false, defaultValue = "5" ) Integer limit,
+                                    @RequestParam( required = false, value = "[]" ) String... deserializeOptions ){
+        return surveyService.getTop( sortBy, limit, DeserializeSurveyOptions.fromStrings( deserializeOptions ) );
     }
 
     @RequestMapping( value = "/survey", method = RequestMethod.GET )
-    public ResponseEntity<?> getSurveyById( @RequestParam Integer id ){
+    public ResponseEntity<?> getSurveyById( @RequestParam Integer id ) throws JsonProcessingException{
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType( MediaType.APPLICATION_JSON_UTF8 );
         Survey survey = surveyService.getSurveyById( id ).orElseThrow( () -> new SurveyNotFoundException( id ) );
@@ -82,7 +81,7 @@ public class ClientController{
     @RequestMapping( value = "/user/doneSurveys", method = RequestMethod.GET )
     public ResponseEntity<?> getSurveysDoneByUser( @RequestParam String login ) throws JsonProcessingException{
         return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
-                new ObjectMapper().writeValueAsString( ( userService.getUser( login ).orElseThrow(
+                objectMapper.writeValueAsString( ( userService.getUser( login ).orElseThrow(
                         () -> new UsernameNotFoundException( login ) ).getAnswers() ) ) );
     }
 
@@ -98,7 +97,7 @@ public class ClientController{
 
     @RequestMapping( value = "/registration", method = RequestMethod.POST )
     public ResponseEntity<?> newUser( @RequestParam( "newUser" ) String JSONUser ) throws IOException{
-        User user = new ObjectMapper().readValue( JSONUser, User.class );
+        User user = objectMapper.readValue( JSONUser, User.class );
         if( validator.validate( user ) ){
             userService.saveUser( user );
             return ResponseEntity.ok().build();
@@ -143,9 +142,9 @@ public class ClientController{
     @RequestMapping( value = "/doneSurvey", method = RequestMethod.POST )
     public void doneSurvey( @RequestParam String answers, @RequestParam Integer id, @RequestParam String login )
             throws IOException{
-        List<Integer> listAnswers = new ObjectMapper().readValue( answers, new TypeReference<List<Integer>>(){} );
-        Survey survey = surveyService.getSurveyById( id ).get();
-        User   user   = userService.getUser( login ).get();
+        List<Integer> listAnswers = objectMapper.readValue( answers, new TypeReference<List<Integer>>(){} );
+        Survey        survey      = surveyService.getSurveyById( id ).get();
+        User          user        = userService.getUser( login ).get();
         return;
     }
 
@@ -153,7 +152,7 @@ public class ClientController{
     public void newSurvey( @RequestParam String createdSurvey ) throws IOException{
         Survey survey = null;
         try{
-            survey = new ObjectMapper().readValue( createdSurvey, Survey.class );
+            survey = objectMapper.readValue( createdSurvey, Survey.class );
         }catch( JsonParseException | JsonMappingException e ){
             e.printStackTrace();
         }

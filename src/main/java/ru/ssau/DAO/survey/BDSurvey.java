@@ -1,46 +1,67 @@
 package ru.ssau.DAO.survey;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import ru.ssau.DAO.user.DeserializeUserOptions;
+import ru.ssau.DAO.user.UserDAO;
 import ru.ssau.domain.*;
+import ru.ssau.exceptions.UserNotFoundException;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-class DBSurvey{
+class BDSurvey{
 
-    public DBSurvey(){
+    @Autowired
+    private UserDAO userDAO;
+
+    public BDSurvey(){
     }
 
-    DBSurvey( Survey survey ){
+    BDSurvey( Survey survey ){
         this.id = survey.getId();
         this.name = survey.getName();
         this.comment = survey.getComment();
         this.creator = survey.getCreator().getLogin();
         this.date = survey.getDate();
-        this.category = survey.getCategory().getName();
+        this.categoryName = survey.getCategory().getName();
     }
 
-    Survey toSurvey( DeserializeSurveyOption... options ){
-        List<DeserializeSurveyOption> deserializeSurveyOptions = Arrays.asList( options );
-        Survey                        survey                   = new Survey();
+    Survey toSurvey(){
+        Survey survey = new Survey();
         survey.setId( this.id );
         survey.setName( this.name );
         survey.setComment( this.comment );
-        if( deserializeSurveyOptions.contains( DeserializeSurveyOption.CREATOR ) )
-            survey.setCreator( getCreator( this.creator ) );
-        if( deserializeSurveyOptions.contains( DeserializeSurveyOption.USERS ) )
-            survey.setAnswers( getAnswers( this.id ) );
-        if( deserializeSurveyOptions.contains( DeserializeSurveyOption.QUESTIONS ) )
-            survey.setQuestions( getQuestions( this.id ) );
-        if( deserializeSurveyOptions.contains( DeserializeSurveyOption.CATEGORY ) )
-            survey.setCategory( getCategory( this.category ) );
+        survey.setAnswers( this.answers );
+        survey.setQuestions( this.questions );
+        survey.setCreator( this.userCreator );
         survey.setDate( this.date );
+        survey.setCategory( this.category );
         return survey;
     }
 
-    private User getCreator( String login ){
-        // TODO: 13.06.17 Найти создателя
-        return null;
+    public BDSurvey addCreator( DeserializeUserOptions... options ){
+        try{
+            this.userCreator = getCreator( this.creator , options );
+        }catch( IOException e ){
+            throw new IllegalArgumentException( "Не удалось загразить пользователя " + this.creator );
+        }
+        return this;
+    }
+
+    private User getCreator( String login , DeserializeUserOptions... options ) throws IOException{
+        return userDAO.listUsersByPredicate( path -> path.toString().substring( userDAO.getDirectoryNameLength() ).equals( login ) ,
+                                        1 ,
+                                             options )
+                .stream()
+                .findFirst()
+                .orElseThrow( () -> new UserNotFoundException( login ) );
+    }
+
+    public BDSurvey addQuestions(){
+        this.questions = getQuestions( this.id );
+        return this;
     }
 
     private List<Question> getQuestions( Integer id ){
@@ -48,9 +69,19 @@ class DBSurvey{
         return null;
     }
 
+    public BDSurvey addAnswers(){
+        this.answers = getAnswers( this.id );
+        return this;
+    }
+
     private List<UserAnswer> getAnswers( Integer id ){
         // TODO: 13.06.17 Найти ответы
         return null;
+    }
+
+    public BDSurvey addCategory(){
+        this.category = getCategory( this.categoryName );
+        return this;
     }
 
     private Category getCategory( String name ){
@@ -63,7 +94,12 @@ class DBSurvey{
     private String  comment;
     private String  creator;
     private Date    date;
-    private String  category;
+    private String  categoryName;
+    private User    userCreator;
+    private List<Question> questions;
+    private List<UserAnswer> answers;
+    private Category category;
+
 
     public Integer getId(){
         return id;
@@ -106,10 +142,10 @@ class DBSurvey{
     }
 
     public String getCategory(){
-        return category;
+        return categoryName;
     }
 
     public void setCategory( String category ){
-        this.category = category;
+        this.categoryName = category;
     }
 }
