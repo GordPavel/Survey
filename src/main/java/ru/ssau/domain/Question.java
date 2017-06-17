@@ -19,7 +19,6 @@ public class Question{
         name = "question" + id;
         answers = Stream.iterate( new Answer( 1 ), new UnaryOperator<Answer>(){
             int i = 1;
-
             @Override
             public Answer apply( Answer t ){
                 return new Answer( ++i );

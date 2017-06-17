@@ -58,10 +58,10 @@ public class UserDAO{
         return bdUserStream.limit( limit ).map( BDUser::toUser ).collect( Collectors.toList());
     }
 
-    public Optional<User> findUser( String login , DeserializeUserOptions[] userOptions , DeserializeSurveyOptions...surveyOptions  )
+    public Optional<User> findUser( String login , DeserializeUserOptions... userOptions )
             throws IOException{
         return listUsersByPredicate( path -> path.toString().substring( getDirectoryNameLength() ).startsWith( login ) ,
-                                     1 , userOptions , surveyOptions ).stream().findFirst();
+                                     1 , userOptions ).stream().findFirst();
     }
 
     public void saveNewUser( User user ) throws IOException{

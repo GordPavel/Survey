@@ -1,41 +1,25 @@
 package ru.ssau.controller;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.ssau.DAO.survey.DeserializeSurveyOptions;
-import ru.ssau.domain.Category;
 import ru.ssau.domain.Survey;
-import ru.ssau.domain.User;
-import ru.ssau.exceptions.SurveyNotFoundException;
 import ru.ssau.service.SurveyService;
 import ru.ssau.service.UserService;
 import ru.ssau.service.filesmanager.FilesManager;
 import ru.ssau.service.filesmanager.MyFile;
 import ru.ssau.service.validation.UserRegistrationValidator;
-import ru.ssau.transport.SurveyTransport;
-import ru.ssau.transport.TopicTransport;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping( value = "/client" )
@@ -64,108 +48,64 @@ public class ClientController{
 
     @RequestMapping( value = "/survey", method = RequestMethod.GET )
     public ResponseEntity<?> getSurveyById( @RequestParam Integer id ) throws JsonProcessingException{
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType( MediaType.APPLICATION_JSON_UTF8 );
-        Survey survey = surveyService.getSurveyById( id ).orElseThrow( () -> new SurveyNotFoundException( id ) );
-        return ResponseEntity.accepted().headers( headers ).body( survey );
+        // TODO: 16.06.17
+        return null;
     }
 
     @RequestMapping( value = "/user", method = RequestMethod.GET )
     public ResponseEntity<?> getUserByLogin( @RequestParam String login ){
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType( MediaType.APPLICATION_JSON_UTF8 );
-        return ResponseEntity.accepted().headers( headers ).body(
-                userService.getUser( login ).orElseThrow( () -> new UsernameNotFoundException( login ) ) );
+        // TODO: 16.06.17
+        return null;
     }
 
-        @RequestMapping(value = {"/user/doneSurveys"}, method = {RequestMethod.GET})
-    public ResponseEntity<?> getDoneSurveysByLogin(@RequestParam String login) throws JsonProcessingException {
-        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON_UTF8).body(
-                (new ObjectMapper()).writeValueAsString(((User)this.userService.getUser(login).orElseThrow(() -> {
-            return new UsernameNotFoundException(login);
-        })).getSurveysDone()));
+    @RequestMapping( value = { "/user/doneSurveys" }, method = { RequestMethod.GET } )
+    public ResponseEntity<?> getDoneSurveysByLogin( @RequestParam String login ) throws JsonProcessingException{
+        // TODO: 16.06.17
+        return null;
     }
 
-    @RequestMapping(value = {"/user/madeSurveys"}, method = {RequestMethod.GET})
-    public ResponseEntity<?> getMadeSurveysByLogin(@RequestParam String login) throws JsonProcessingException {
-        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON_UTF8).body(
-                (new ObjectMapper()).writeValueAsString(((User)this.userService.getUser(login).orElseThrow(() -> {
-            return new UsernameNotFoundException(login);
-        })).getSurveysMade()));
+    @RequestMapping( value = { "/user/madeSurveys" }, method = { RequestMethod.GET } )
+    public ResponseEntity<?> getMadeSurveysByLogin( @RequestParam String login ) throws JsonProcessingException{
+        // TODO: 16.06.17
+        return null;
     }
 
     @RequestMapping( value = "/login", method = RequestMethod.POST )
     public ResponseEntity<?> login( @RequestParam String login, @RequestParam String password ){
-        Optional<User> userOptional = userService.getUser( login );
-        if( !userOptional.isPresent() ) return ResponseEntity.notFound().build();
-        User user = userOptional.get();
-        if( !user.getPassword().equals( passwordEncoder.encodePassword( password, null ) ) )
-            return ResponseEntity.badRequest().build();
-        return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body( user );
+        // TODO: 16.06.17
+        return null;
     }
 
     @RequestMapping( value = "/registration", method = RequestMethod.POST )
     public ResponseEntity<?> newUser( @RequestParam( "newUser" ) String JSONUser ) throws IOException{
-        User user = objectMapper.readValue( JSONUser, User.class );
-        if( validator.validate( user ) ){
-            userService.saveUser( user );
-            return ResponseEntity.ok().build();
-        }else return ResponseEntity.badRequest().build();
+        // TODO: 16.06.17
+        return null;
     }
 
     @RequestMapping( value = "/topics", method = RequestMethod.GET )
     public ResponseEntity<?> topics( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
                                      @RequestParam( required = false, defaultValue = "3" ) Integer limit ){
-        List<TopicTransport> list;
-        if( sortBy.equals( "users" ) ) list = surveyService.getCategories().stream().map(
-                category -> new TopicTransport( category.getName(), category.getSurveys().stream().sorted(
-                        Comparator.comparingInt( Survey::getUsersDone ) ).limit( limit ).map(
-                        survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect(
-                        Collectors.toList() ) ) ).collect( Collectors.toList() );
-        else{
-            list = surveyService.getCategories().stream().map( category -> new TopicTransport( category.getName(),
-                                                                                               category.getSurveys().stream().sorted(
-                                                                                                       Comparator.comparingLong(
-                                                                                                               survey -> survey.getDate().getTime() ) ).limit(
-                                                                                                       limit ).map(
-                                                                                                       survey -> new SurveyTransport(
-                                                                                                               survey.getId(),
-                                                                                                               survey.getName() ) ).collect(
-                                                                                                       Collectors.toList() ) ) ).collect(
-                    Collectors.toList() );
-        }
-        return ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body( list );
+        // TODO: 16.06.17
+        return null;
     }
 
     @RequestMapping( value = "/topic", method = RequestMethod.GET )
     public ResponseEntity<?> getTopic( @RequestParam String name ){
-        Optional<Category> optional = surveyService.getCategoryByName( name );
-        return optional.<ResponseEntity<?>>map(
-                category -> ResponseEntity.status( HttpStatus.OK ).contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
-                        new TopicTransport( category.getName(), category.getSurveys().stream().map(
-                                survey -> new SurveyTransport( survey.getId(), survey.getName() ) ).collect(
-                                Collectors.toList() ) ) ) ).orElseGet( () -> ResponseEntity.notFound().build() );
+        // TODO: 16.06.17
+        return null;
     }
 
 
     @RequestMapping( value = "/doneSurvey", method = RequestMethod.POST )
     public void doneSurvey( @RequestParam String answers, @RequestParam Integer id, @RequestParam String login )
             throws IOException{
-        List<Integer> listAnswers = objectMapper.readValue( answers, new TypeReference<List<Integer>>(){} );
-        Survey        survey      = surveyService.getSurveyById( id ).get();
-        User          user        = userService.getUser( login ).get();
+        // TODO: 16.06.17
         return;
     }
 
     @RequestMapping( value = "/createdSurvey", method = RequestMethod.POST )
     public void newSurvey( @RequestParam String createdSurvey ) throws IOException{
-        Survey survey = null;
-        try{
-            survey = objectMapper.readValue( createdSurvey, Survey.class );
-        }catch( JsonParseException | JsonMappingException e ){
-            e.printStackTrace();
-        }
-        survey.setDate( new Date() );
+        // TODO: 16.06.17
         return;
     }
 

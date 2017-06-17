@@ -39,8 +39,8 @@ public class WebController{
     @RequestMapping( method = RequestMethod.GET )
     public String start( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
                          @RequestParam( required = false, defaultValue = "5" ) Integer limit, Model model ){
-        model.addAttribute( "surveys", surveyService.getTop( sortBy, limit, DeserializeSurveyOptions.fromStrings() ) );
-        return "index";
+        // TODO: 16.06.17
+        return null;
     }
 
     @RequestMapping( value = "/info", method = RequestMethod.GET )
@@ -61,33 +61,24 @@ public class WebController{
     @RequestMapping( value = "/topics", method = RequestMethod.GET )
     public String topics( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
                           @RequestParam( required = false, defaultValue = "3" ) Integer limit, Model model ){
-        if( sortBy.equals( "users" ) ) model.addAttribute( "topics", surveyService.getCategories().stream().peek(
-                category -> category.setSurveys(
-                        category.getSurveys().stream().sorted( Comparator.comparingInt( Survey::getUsersDone ) ).limit(
-                                limit ).collect( Collectors.toList() ) ) ).collect( Collectors.toList() ) );
-        else if( sortBy.equals( "time" ) ) model.addAttribute( "topics", surveyService.getCategories().stream().peek(
-                category -> category.setSurveys( category.getSurveys().stream().sorted(
-                        Comparator.comparingLong( ( survey ) -> survey.getDate().getTime() ) ).limit( limit ).collect(
-                        Collectors.toList() ) ) ).collect( Collectors.toList() ) );
+        // TODO: 16.06.17
         return "topics";
     }
 
     @RequestMapping( value = "/topic", method = RequestMethod.GET )
     public String topic( @RequestParam String name, Model model ){
-        model.addAttribute( "topic", surveyService.getCategoryByName( name ).orElseThrow(
-                () -> new CategoryNotFoundException( name ) ) );
+        // TODO: 16.06.17
         return "topic";
     }
 
     @RequestMapping( value = "/user", method = RequestMethod.GET )
     public String getUserByLogin( @RequestParam String login, Model model ){
-        model.addAttribute( "user", userService.getUser( login ) );
+        // TODO: 16.06.17
         return "user";
     }
 
     @RequestMapping( value = "/survey", method = RequestMethod.GET )
     public String survey( @RequestParam Integer id, Model model ){
-        model.addAttribute( "survey", surveyService.getSurveyById( id ) );
         // TODO: 17.05.17 Страница анкеты
         return "survey";
     }

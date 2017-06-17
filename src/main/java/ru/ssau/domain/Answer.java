@@ -4,6 +4,7 @@ public class Answer{
 
     private Integer id;
     private String  name;
+    private Integer usersAnswered;
 
     public Answer(){
     }
@@ -27,5 +28,13 @@ public class Answer{
 
     public void setName( String name ){
         this.name = name;
+    }
+
+    public Integer getUsersAnswered(){
+        return usersAnswered;
+    }
+
+    public void setUsersAnswered( Integer usersAnswered ){
+        this.usersAnswered = usersAnswered;
     }
 }

@@ -24,47 +24,21 @@ public class SurveyServiceImpl implements SurveyService{
 
     @Override
     public Optional<Survey> getSurveyById( Integer id, DeserializeSurveyOptions[] surveyOptions , DeserializeUserOptions[] userOptions ){
-        try{
-            surveyDAO.beginTransaction();
-            Optional<Survey> survey = surveyDAO.listSurveysByPredicate(
-                    path -> path.toString().substring( surveyDAO.getSurveyDirectoryNameLength() ).startsWith( id.toString() ),
-                    SurveysSort.TIME, Integer.MAX_VALUE, surveyOptions ).stream().findFirst();
-            surveyDAO.endTransaction();
-            return survey;
-        }catch( IOException | InterruptedException e ){
-            return Optional.empty();
-        }
+        // TODO: 16.06.17  
+        return null;
     }
 
 
     @Override
     public Optional<User> getMadeUser( Integer id, DeserializeUserOptions... options ){
-        try{
-            surveyDAO.beginTransaction();
-            Optional<User> user = Optional.ofNullable( surveyDAO.listSurveysByPredicate(
-                    path -> path.toString().substring( surveyDAO.getSurveyDirectoryNameLength() ).startsWith( id.toString() ),
-                    SurveysSort.TIME, 1, DeserializeSurveyOptions.CREATOR ).
-                    stream().
-                    findFirst().
-                    orElseThrow( () -> new SurveyNotFoundException( id ) ).getCreator() );
-            surveyDAO.endTransaction();
-            return user;
-        }catch( IOException | InterruptedException e ){
-            return Optional.empty();
-        }
+        // TODO: 16.06.17
+        return null;
     }
 
     @Override
     public List<Survey> getTop( String sortBy, Integer limit, DeserializeSurveyOptions... options ){
-        try{
-            surveyDAO.beginTransaction();
-            List<Survey> surveys = surveyDAO.listSurveysByPredicate( survey -> true, SurveysSort.valueOf( sortBy ),
-                                                                     limit, options );
-            surveyDAO.endTransaction();
-            return surveys;
-        }catch( IOException | InterruptedException e ){
-            return new ArrayList<>();
-        }
+        // TODO: 16.06.17
+        return null;
     }
 
     @Override

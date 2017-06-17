@@ -30,6 +30,19 @@ public class Survey{
     public Survey(){
     }
 
+    public Survey( Integer id ){
+        this.id = id;
+        name = "survey" + id;
+        comment = "test";
+        questions = Stream.iterate( new Question( 1 ), new UnaryOperator<Question>(){
+            int i = 0;
+            @Override
+            public Question apply( Question question ){
+                return new Question( ++i );
+            }
+        } ).limit( ( int )( 1 + ( long ) ( Math.random() * ( 11 - 1 ) ) ) ).collect( Collectors.toList() );
+    }
+
     public Integer getId(){
         return id;
     }

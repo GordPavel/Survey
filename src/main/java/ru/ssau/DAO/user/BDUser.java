@@ -1,5 +1,6 @@
 package ru.ssau.DAO.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.ssau.DAO.survey.DeserializeSurveyOptions;
 import ru.ssau.DAO.survey.SurveyDAO;
@@ -18,10 +19,10 @@ public class BDUser{
     private String           name;
     private String           lastName;
     private String           role;
+    @JsonIgnore
     private List<UserAnswer> answers;
+    @JsonIgnore
     private List<Survey>     madeByUserSurveys;
-    @Autowired
-    private SurveyDAO        surveyDAO;
 
     public BDUser( User user ){
         login = user.getLogin();

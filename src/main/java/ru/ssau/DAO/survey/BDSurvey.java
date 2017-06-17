@@ -1,20 +1,29 @@
 package ru.ssau.DAO.survey;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
+import ru.ssau.DAO.user.BDUser;
 import ru.ssau.DAO.user.DeserializeUserOptions;
 import ru.ssau.DAO.user.UserDAO;
 import ru.ssau.domain.*;
+import ru.ssau.exceptions.CategoryNotFoundException;
 import ru.ssau.exceptions.UserNotFoundException;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-class BDSurvey{
-
-    @Autowired
-    private UserDAO userDAO;
+public class BDSurvey{
 
     public BDSurvey(){
     }
@@ -41,71 +50,27 @@ class BDSurvey{
         return survey;
     }
 
-    public BDSurvey addCreator( DeserializeUserOptions... options ){
-        try{
-            this.userCreator = getCreator( this.creator , options );
-        }catch( IOException e ){
-            throw new IllegalArgumentException( "Не удалось загразить пользователя " + this.creator );
-        }
-        return this;
-    }
+    private Integer          id;
+    private String           name;
+    private String           comment;
+    private String           creator;
+    private Date             date;
+    private String           categoryName;
 
-    private User getCreator( String login , DeserializeUserOptions... options ) throws IOException{
-        return userDAO.listUsersByPredicate( path -> path.toString().substring( userDAO.getDirectoryNameLength() ).equals( login ) ,
-                                        1 ,
-                                             options )
-                .stream()
-                .findFirst()
-                .orElseThrow( () -> new UserNotFoundException( login ) );
-    }
-
-    public BDSurvey addQuestions(){
-        this.questions = getQuestions( this.id );
-        return this;
-    }
-
-    private List<Question> getQuestions( Integer id ){
-        // TODO: 13.06.17 Найти впоросы
-        return null;
-    }
-
-    public BDSurvey addAnswers(){
-        this.answers = getAnswers( this.id );
-        return this;
-    }
-
-    private List<UserAnswer> getAnswers( Integer id ){
-        // TODO: 13.06.17 Найти ответы
-        return null;
-    }
-
-    public BDSurvey addCategory(){
-        this.category = getCategory( this.categoryName );
-        return this;
-    }
-
-    private Category getCategory( String name ){
-        // TODO: 13.06.17 Найти категорию
-        return null;
-    }
-
-    private Integer id;
-    private String  name;
-    private String  comment;
-    private String  creator;
-    private Date    date;
-    private String  categoryName;
-    private User    userCreator;
-    private List<Question> questions;
+    @JsonIgnore
+    private User             userCreator;
+    @JsonIgnore
+    private List<Question>   questions;
+    @JsonIgnore
     private List<UserAnswer> answers;
-    private Category category;
-
+    @JsonIgnore
+    private Category         category;
 
     public Integer getId(){
         return id;
     }
 
-    public void setId( Integer id ){
+    void setId( Integer id ){
         this.id = id;
     }
 
@@ -141,11 +106,43 @@ class BDSurvey{
         this.date = date;
     }
 
-    public String getCategory(){
+    public String getCategoryName(){
         return categoryName;
     }
 
-    public void setCategory( String category ){
-        this.categoryName = category;
+    void setCategoryName( String categoryName ){
+        this.categoryName = categoryName;
+    }
+
+    User getUserCreator(){
+        return userCreator;
+    }
+
+    void setUserCreator( User userCreator ){
+        this.userCreator = userCreator;
+    }
+
+    List<Question> getQuestions(){
+        return questions;
+    }
+
+    void setQuestions( List<Question> questions ){
+        this.questions = questions;
+    }
+
+    List<UserAnswer> getAnswers(){
+        return answers;
+    }
+
+    void setAnswers( List<UserAnswer> answers ){
+        this.answers = answers;
+    }
+
+    Category getCategory(){
+        return category;
+    }
+
+    void setCategory( Category category ){
+        this.category = category;
     }
 }
