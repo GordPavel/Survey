@@ -1,5 +1,6 @@
 package ru.ssau.service;
 
+import ru.ssau.DAO.enums.DeserializeUserOptions;
 import ru.ssau.domain.User;
 import ru.ssau.transport.UserRegistrationForm;
 
@@ -9,9 +10,9 @@ import java.util.Optional;
 
 public interface UserService{
 
-    Optional<User> getUser( String login );
+    Optional<User> getUser( String login , DeserializeUserOptions... options );
 
-    List<User> getUsers();
+    List<User> getUsers( DeserializeUserOptions ... options  );
 
     void saveUser( UserRegistrationForm user ) throws IOException;
 

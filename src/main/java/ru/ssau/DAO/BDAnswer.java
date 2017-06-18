@@ -1,23 +1,24 @@
-package ru.ssau.DAO.survey;
+package ru.ssau.DAO;
 
 import ru.ssau.domain.Answer;
 
 public class BDAnswer{
     Integer id;
-    String  name;
+    private String  name;
 
     public BDAnswer(){
     }
 
-    public BDAnswer( Answer answer ){
+    BDAnswer( Answer answer ){
         this.id = answer.getId();
         this.name = answer.getName();
     }
 
-    public Answer toAnswer(){
+    Answer toAnswer(){
         Answer answer = new Answer();
         answer.setId( this.id );
         answer.setName( this.name );
+        answer.setUsersAnswered( 0 );
         return answer;
     }
 

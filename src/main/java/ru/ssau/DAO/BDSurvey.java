@@ -1,27 +1,10 @@
-package ru.ssau.DAO.survey;
+package ru.ssau.DAO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
-import ru.ssau.DAO.user.BDUser;
-import ru.ssau.DAO.user.DeserializeUserOptions;
-import ru.ssau.DAO.user.UserDAO;
 import ru.ssau.domain.*;
-import ru.ssau.exceptions.CategoryNotFoundException;
-import ru.ssau.exceptions.UserNotFoundException;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class BDSurvey{
 
@@ -37,7 +20,8 @@ public class BDSurvey{
         this.categoryName = survey.getCategory().getName();
     }
 
-    Survey toSurvey(){
+    @JsonIgnore
+    public Survey toSurvey(){
         Survey survey = new Survey();
         survey.setId( this.id );
         survey.setName( this.name );

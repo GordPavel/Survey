@@ -10,18 +10,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.ssau.DAO.survey.DeserializeSurveyOptions;
-import ru.ssau.domain.Survey;
-import ru.ssau.exceptions.CategoryNotFoundException;
 import ru.ssau.service.SurveyService;
 import ru.ssau.service.UserService;
 import ru.ssau.service.validation.UserRegistrationValidator;
 import ru.ssau.transport.UserRegistrationForm;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping( "/" )
@@ -39,8 +34,8 @@ public class WebController{
     @RequestMapping( method = RequestMethod.GET )
     public String start( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
                          @RequestParam( required = false, defaultValue = "5" ) Integer limit, Model model ){
-        // TODO: 16.06.17
-        return null;
+        model.addAttribute( "surveys", surveyService.getTop( sortBy, limit ) );
+        return "index";
     }
 
     @RequestMapping( value = "/info", method = RequestMethod.GET )

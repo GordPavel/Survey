@@ -4,15 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import ru.ssau.DAO.survey.DeserializeCategoryOptions;
-import ru.ssau.DAO.survey.DeserializeSurveyOptions;
-import ru.ssau.DAO.survey.SurveyDAO;
-import ru.ssau.DAO.survey.SurveysSort;
+import ru.ssau.DAO.DAO;
+import ru.ssau.DAO.enums.DeserializeSurveyOptions;
+import ru.ssau.DAO.enums.DeserializeUserOptions;
+import ru.ssau.DAO.enums.SurveysSort;
 import ru.ssau.config.WebAppConfig;
-import ru.ssau.domain.Category;
-import ru.ssau.domain.Survey;
-import ru.ssau.domain.User;
+import ru.ssau.domain.*;
+import ru.ssau.exceptions.UserNotFoundException;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -21,59 +21,126 @@ import java.util.List;
 @WebAppConfiguration
 public class DAOTest{
 
-    private Survey    survey;
+    private Survey  survey;
+    private User    user;
     @Autowired
-    private SurveyDAO surveyDAO;
+    private DAO     DAO;
 
     {
-        survey = new Survey( 1 );
-        User user = new User();
+        user = new User();
         user.setLogin( "login" );
+        user.setName( "name" );
+        user.setLastName( "lastName" );
+        user.setPassword( "password" );
+        user.setRole( UserRoles.ADMIN );
+        survey = new Survey( 1 );
         survey.setCreator( user );
         survey.setDate( new Date() );
         Category category = new Category();
-        category.setName( "category2" );
+        category.setName( "category" );
         survey.setCategory( category );
     }
 
     @Test
     public void saveSurvey() throws Exception{
+        user.setLogin( "login0" );
+        Category category = new Category();
+        survey.setCategory( category );
         for( int i = 0 ; i < 10 ; i++ ){
-            survey.getCategory().setName( "category" + i );
-            surveyDAO.saveNewSurvey( survey );
+            category.setName( "category" + i );
+            DAO.saveNewSurvey( survey );
         }
     }
 
     @Test
     public void listAllSurveys() throws Exception{
-        List<Survey> surveys = surveyDAO.listSurveysByPredicate( path -> true, SurveysSort.TIME, Integer.MAX_VALUE,
-                                                                 DeserializeSurveyOptions.QUESTIONS,
-                                                                 DeserializeSurveyOptions.CATEGORY );
+        List<Survey> surveys = DAO.listSurveysByPredicate( path -> true, SurveysSort.TIME, Integer.MAX_VALUE,
+                                                           DeserializeSurveyOptions.QUESTIONS,
+                                                           DeserializeSurveyOptions.CATEGORY );
         surveys = null;
     }
 
     @Test
     public void getSurvey() throws Exception{
-        Survey getSurvey = surveyDAO.findSurvey( 10, DeserializeSurveyOptions.CATEGORY,
-                                                 DeserializeSurveyOptions.QUESTIONS ).get();
-        getSurvey = null;
+        Survey getSurvey = DAO.findSurvey( 11, DeserializeSurveyOptions.CATEGORY,
+                                           DeserializeSurveyOptions.QUESTIONS , DeserializeSurveyOptions.USERS ).get();
+        getSurvey.getQuestions().forEach( question -> {
+            System.out.println( question.getId() + " " + question.getName() );
+            question.getAnswers().forEach( answer -> System.out.println(
+                    "    " + answer.getId() + " " + answer.getName() + " " + answer.getUsersAnswered() ));
+        } );
     }
 
     @Test
     public void updateSurvey() throws Exception{
-        surveyDAO.updateSurvey( 2, bdSurvey -> bdSurvey.setName( "newName" ) );
+        DAO.updateSurvey( 2, bdSurvey -> bdSurvey.setName( "newName" ) );
     }
 
     @Test
     public void deleteSurvey() throws Exception{
-        surveyDAO.deleteSurvey( 1 );
+        DAO.deleteSurvey( 2 );
     }
 
     @Test
     public void listAllCategories() throws Exception{
-        surveyDAO.listCategories( DeserializeCategoryOptions.SURVEYS ).forEach( category ->{
+        DAO.listCategories( true , SurveysSort.USERS, Integer.MAX_VALUE ).forEach( category ->{
             System.out.println( category.getName() );
-            category.getSurveys().forEach( survey1 -> System.out.println( " " + survey1.getId() ) );
+            category.getSurveys().forEach( survey1 -> {
+                System.out.println( survey1.getId() + "   " + survey1.getName() + survey1.getAnswers().size() );
+                survey1.getQuestions().forEach( question -> {
+                    System.out.println( "       " +  question.getId() + " " + question.getName() );
+                    question.getAnswers().forEach( answer -> {
+                        System.out.println( "           " + answer.getId() + " " + answer.getName() + " " + answer.getUsersAnswered() );
+                    } );
+                } );
+            } );
         } );
+    }
+
+    @Test
+    public void saveUser() throws Exception{
+        DAO.saveUser( user );
+    }
+
+    @Test
+    public void getUser() throws Exception{
+        User user = DAO.findUser( "login" , DeserializeUserOptions.MADESURVEYS ).orElseThrow( () -> new UserNotFoundException( "login" ) );
+        user = null;
+    }
+
+    @Test
+    public void listAllUsers() throws Exception{
+        List<User> users = DAO.listAllUsers( DeserializeUserOptions.MADESURVEYS );
+        users = null;
+    }
+
+    @Test
+    public void updateUser() throws Exception{
+        DAO.updateUser( "login3" , bdUser -> bdUser.setRole( UserRoles.USER.toString() ) );
+    }
+
+    @Test
+    public void deleteUser() throws Exception{
+        DAO.deleteUser( "login" );
+    }
+
+    @Test
+    public void saveUserAnswer() throws Exception{
+        UserAnswer userAnswer = new UserAnswer();
+        userAnswer.setUser( DAO.findUser( "login3" ).get() );
+        userAnswer.setSurvey( DAO.findSurvey( 11 ).get() );
+        userAnswer.setAnswers( Arrays.asList( 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ) );
+        DAO.saveNewUserAnswer( userAnswer );
+    }
+
+    @Test
+    public void listAllUserAnswers() throws Exception{
+        DAO.listAllUserAnswersByUserLogin( "login" , false )
+                .forEach( userAnswer -> System.out.println( userAnswer.getUser().getLogin() + " " + userAnswer.getSurvey().getId() ) );
+    }
+
+    @Test
+    public void deleteUserAnswers() throws Exception{
+        DAO.deleteUserAnswers( 1 );
     }
 }

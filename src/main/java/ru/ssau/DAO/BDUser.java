@@ -1,15 +1,11 @@
-package ru.ssau.DAO.user;
+package ru.ssau.DAO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.ssau.DAO.survey.DeserializeSurveyOptions;
-import ru.ssau.DAO.survey.SurveyDAO;
 import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
 import ru.ssau.domain.UserAnswer;
 import ru.ssau.domain.UserRoles;
 
-import java.io.IOException;
 import java.util.List;
 
 public class BDUser{
@@ -19,12 +15,16 @@ public class BDUser{
     private String           name;
     private String           lastName;
     private String           role;
+
     @JsonIgnore
     private List<UserAnswer> answers;
     @JsonIgnore
     private List<Survey>     madeByUserSurveys;
 
-    public BDUser( User user ){
+    public BDUser(){
+    }
+
+    BDUser( User user ){
         login = user.getLogin();
         password = user.getPassword();
         name = user.getName();
@@ -32,7 +32,7 @@ public class BDUser{
         role = user.getRole().name();
     }
 
-    public User toUser(){
+    User toUser(){
         User user = new User();
         user.setLogin( this.login );
         user.setPassword( this.password );
@@ -42,34 +42,6 @@ public class BDUser{
         user.setAnswers( this.answers );
         user.setMadeSurveys( this.madeByUserSurveys );
         return user;
-    }
-
-    public BDUser addAnswers(){
-        try{
-            this.answers = getUserAnswers();
-        }catch( IOException e ){
-            throw new IllegalArgumentException( "Не удалось загрузить ответы пользователя " + login );
-        }
-        return this;
-    }
-
-    private List<UserAnswer> getUserAnswers() throws IOException{
-        // TODO: 14.06.17
-        return null;
-    }
-
-    public BDUser addMadeByUserSurveys( DeserializeSurveyOptions... options ){
-        try{
-            this.madeByUserSurveys = getMadeByUserSurveys( options );
-        }catch( IOException e ){
-            throw new IllegalArgumentException( "Не удалось загрузить анкеты, сделанные пользователем " + login );
-        }
-        return this;
-    }
-
-    private List<Survey> getMadeByUserSurveys( DeserializeSurveyOptions... options ) throws IOException{
-        // TODO: 15.06.17
-        return null;
     }
 
     public String getLogin(){
@@ -110,5 +82,21 @@ public class BDUser{
 
     public void setRole( String role ){
         this.role = role;
+    }
+
+    public List<UserAnswer> getAnswers(){
+        return answers;
+    }
+
+    void setAnswers( List<UserAnswer> answers ){
+        this.answers = answers;
+    }
+
+    public List<Survey> getMadeByUserSurveys(){
+        return madeByUserSurveys;
+    }
+
+    void setMadeByUserSurveys( List<Survey> madeByUserSurveys ){
+        this.madeByUserSurveys = madeByUserSurveys;
     }
 }

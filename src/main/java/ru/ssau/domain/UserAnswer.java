@@ -1,16 +1,11 @@
 package ru.ssau.domain;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
 import java.util.List;
 
 public class UserAnswer{
     private Survey survey;
     private User   user;
-    private String answers;
+    private List<Integer>   answers;
 
     public UserAnswer(){
     }
@@ -31,12 +26,11 @@ public class UserAnswer{
         this.user = user;
     }
 
-    public List<Integer> getAnswers() throws IOException{
-        return new ObjectMapper().readValue( this.answers, new TypeReference<List<Integer>>(){} );
+    public List<Integer> getAnswers(){
+        return answers;
     }
 
-    public void setAnswers( List<Integer> answers ) throws JsonProcessingException{
-        // TODO: 01.06.17 Проверки
-        this.answers = new ObjectMapper().writeValueAsString( answers );
+    public void setAnswers( List<Integer> answers ){
+        this.answers = answers;
     }
 }

@@ -1,4 +1,4 @@
-package ru.ssau.DAO.survey;
+package ru.ssau.DAO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ru.ssau.domain.Answer;

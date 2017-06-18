@@ -2,10 +2,10 @@ package ru.ssau.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.ssau.DAO.survey.DeserializeSurveyOptions;
-import ru.ssau.DAO.survey.SurveyDAO;
-import ru.ssau.DAO.survey.SurveysSort;
-import ru.ssau.DAO.user.DeserializeUserOptions;
+import ru.ssau.DAO.DAO;
+import ru.ssau.DAO.enums.DeserializeSurveyOptions;
+import ru.ssau.DAO.enums.DeserializeUserOptions;
+import ru.ssau.DAO.enums.SurveysSort;
 import ru.ssau.domain.Category;
 import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
@@ -20,36 +20,49 @@ import java.util.Optional;
 public class SurveyServiceImpl implements SurveyService{
 
     @Autowired
-    private SurveyDAO surveyDAO;
+    private DAO DAO;
 
     @Override
-    public Optional<Survey> getSurveyById( Integer id, DeserializeSurveyOptions[] surveyOptions , DeserializeUserOptions[] userOptions ){
-        // TODO: 16.06.17  
-        return null;
+    public Optional<Survey> getSurveyById( Integer id, DeserializeSurveyOptions... surveyOptions ){
+        try{
+            return DAO.findSurvey( id , surveyOptions );
+        }catch( IOException e ){
+            return Optional.empty();
+        }
     }
 
 
     @Override
     public Optional<User> getMadeUser( Integer id, DeserializeUserOptions... options ){
-        // TODO: 16.06.17
-        return null;
+        return Optional.of( getSurveyById( id , DeserializeSurveyOptions.CREATOR ).orElseThrow( () -> new SurveyNotFoundException( id ) )
+                .getCreator() );
     }
 
     @Override
     public List<Survey> getTop( String sortBy, Integer limit, DeserializeSurveyOptions... options ){
-        // TODO: 16.06.17
-        return null;
+        try{
+            return DAO.listSurveysByPredicate( path -> true , SurveysSort.valueOf( sortBy.toUpperCase() ) , limit , options );
+        }catch( IOException e ){
+            return new ArrayList<>();
+        }
     }
 
     @Override
-    public Optional<Category> getCategoryByName( String name ){
-        // TODO: 13.06.17
-        return null;
+    public Optional<Category> getCategoryByName( String name, Boolean downloadSurveys, SurveysSort surveysSort,
+                                                 Integer limit ){
+        try{
+            return DAO.findCategory( name, downloadSurveys, surveysSort, limit );
+        }catch( IOException e ){
+            return Optional.empty();
+        }
     }
 
     @Override
-    public List<Category> getCategories(){
-        // TODO: 13.06.17
-        return null;
+    public List<Category> getCategories( Boolean downloadSurveys , SurveysSort surveysSort , Integer limit ){
+        try{
+            return DAO.listCategories( downloadSurveys, surveysSort, limit );
+        }catch( IOException e ){
+            return new ArrayList<>();
+        }
     }
 }

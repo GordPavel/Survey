@@ -22,7 +22,7 @@
         <div id="survey">
             <ol>
                 <c:forEach items="${surveys}" var="survey">
-                    <li><a href="<c:url value="/survey?id=${survey.id}"/>">${survey.name}</a></li>
+                    <li><a href="<c:url value="/survey?id=${survey.id}"/>">${survey.id} ${survey.name}</a></li>
                 </c:forEach>
             </ol>
         </div>

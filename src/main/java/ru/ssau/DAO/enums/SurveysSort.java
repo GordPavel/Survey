@@ -1,15 +1,15 @@
-package ru.ssau.DAO.survey;
+package ru.ssau.DAO.enums;
 
 public enum SurveysSort{
 
-    TIME, ANSWERS;
+    TIME, USERS;
 
     SurveysSort toSortType( String type ){
         switch( type ){
             case "time":
                 return TIME;
             case "users":
-                return ANSWERS;
+                return USERS;
             default:
                 throw new IllegalArgumentException( "Нет такого типа" );
         }

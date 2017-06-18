@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import ru.ssau.DAO.survey.DeserializeSurveyOptions;
+import ru.ssau.DAO.enums.DeserializeSurveyOptions;
 import ru.ssau.domain.Survey;
 import ru.ssau.service.SurveyService;
 import ru.ssau.service.UserService;

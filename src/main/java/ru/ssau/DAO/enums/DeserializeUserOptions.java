@@ -1,4 +1,4 @@
-package ru.ssau.DAO.user;
+package ru.ssau.DAO.enums;
 
 public enum DeserializeUserOptions{
     ANSWERS, MADESURVEYS;
