@@ -21,48 +21,56 @@ import java.util.List;
 @WebAppConfiguration
 public class DAOTest{
 
-    private Survey  survey;
-    private User    user;
+    private Survey   survey;
+    private User     user;
+    private Category category;
     @Autowired
-    private DAO     DAO;
+    private DAO      DAO;
 
     {
         user = new User();
-        user.setLogin( "login" );
+        user.setLogin( "user" );
         user.setName( "name" );
         user.setLastName( "lastName" );
         user.setPassword( "password" );
-        user.setRole( UserRoles.ADMIN );
-        survey = new Survey( 1 );
-        survey.setCreator( user );
-        survey.setDate( new Date() );
-        Category category = new Category();
+        user.setRole( UserRoles.USER );
+
+        category = new Category();
         category.setName( "category" );
-        survey.setCategory( category );
+
+    }
+
+    @Test
+    public void saveUser() throws Exception{
+        DAO.saveUser( user );
     }
 
     @Test
     public void saveSurvey() throws Exception{
-        user.setLogin( "login0" );
-        Category category = new Category();
-        survey.setCategory( category );
-        for( int i = 0 ; i < 10 ; i++ ){
+        Date date = new Date();
+        for( int i = 0 ; i < 4 ; i++ ){
+            survey = new Survey( i );
+            survey.setCreator( user );
             category.setName( "category" + i );
+            survey.setCategory( category );
+            date.setYear( date.getYear() - i );
+            survey.setDate( date );
             DAO.saveNewSurvey( survey );
         }
     }
 
     @Test
     public void listAllSurveys() throws Exception{
-        List<Survey> surveys = DAO.listSurveysByPredicate( path -> true, SurveysSort.TIME, Integer.MAX_VALUE,
+        List<Survey> surveys = DAO.listSurveysByPredicate( path -> true, SurveysSort.TIME, Integer.MAX_VALUE, false ,
                                                            DeserializeSurveyOptions.QUESTIONS,
-                                                           DeserializeSurveyOptions.CATEGORY );
+                                                           DeserializeSurveyOptions.CATEGORY ,
+                                                           DeserializeSurveyOptions.CREATOR);
         surveys = null;
     }
 
     @Test
     public void getSurvey() throws Exception{
-        Survey getSurvey = DAO.findSurvey( 11, DeserializeSurveyOptions.CATEGORY,
+        Survey getSurvey = DAO.findSurvey( 11, false ,  DeserializeSurveyOptions.CATEGORY,
                                            DeserializeSurveyOptions.QUESTIONS , DeserializeSurveyOptions.USERS ).get();
         getSurvey.getQuestions().forEach( question -> {
             System.out.println( question.getId() + " " + question.getName() );
@@ -97,10 +105,6 @@ public class DAOTest{
         } );
     }
 
-    @Test
-    public void saveUser() throws Exception{
-        DAO.saveUser( user );
-    }
 
     @Test
     public void getUser() throws Exception{
@@ -128,7 +132,7 @@ public class DAOTest{
     public void saveUserAnswer() throws Exception{
         UserAnswer userAnswer = new UserAnswer();
         userAnswer.setUser( DAO.findUser( "login3" ).get() );
-        userAnswer.setSurvey( DAO.findSurvey( 11 ).get() );
+        userAnswer.setSurvey( DAO.findSurvey( 11 , false ).get() );
         userAnswer.setAnswers( Arrays.asList( 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ) );
         DAO.saveNewUserAnswer( userAnswer );
     }

@@ -9,9 +9,7 @@ import ru.ssau.DAO.enums.DeserializeSurveyOptions;
 import ru.ssau.DAO.enums.DeserializeUserOptions;
 import ru.ssau.DAO.enums.SurveysSort;
 import ru.ssau.domain.*;
-import ru.ssau.exceptions.CategoryNotFoundException;
-import ru.ssau.exceptions.SurveyNotFoundException;
-import ru.ssau.exceptions.UserNotFoundException;
+import ru.ssau.exceptions.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -45,12 +43,12 @@ public class DAO{
         semaphore.release();
     }
 
-    public List<Survey> listSurveysByPredicate( Predicate<Path> predicate, SurveysSort sort, Integer limit,
+    public List<Survey> listSurveysByPredicate( Predicate<Path> predicate, SurveysSort sort, Integer limit, Boolean downloadAnswers ,
                                                 DeserializeSurveyOptions... surveyOptions ) throws IOException{
         List<DeserializeSurveyOptions> surveyOptions1 = new ArrayList<>( Arrays.asList( surveyOptions ) );
         if( sort == SurveysSort.USERS && !surveyOptions1.contains( DeserializeSurveyOptions.USERS ) ){
-            surveyOptions1.add( DeserializeSurveyOptions.USERS );
             surveyOptions1.add( DeserializeSurveyOptions.QUESTIONS );
+            surveyOptions1.add( DeserializeSurveyOptions.USERS );
         }
         List<BDSurvey> bdSurveys = listByPredicate( predicate );
         if( surveyOptions1.contains( DeserializeSurveyOptions.CREATOR ) )
@@ -152,16 +150,17 @@ public class DAO{
                 Collectors.toList() );
     }
 
-    public Optional<Survey> findSurvey( Integer id, DeserializeSurveyOptions ... surveyOptions ) throws IOException{
+    public Optional<Survey> findSurvey( Integer id, Boolean downloadAnswers , DeserializeSurveyOptions ... surveyOptions ) throws IOException{
         return listSurveysByPredicate( path -> {
             String str = path.toString().substring( getAnswersDirectoryNameLength() );
             return str.substring( 0 , str.indexOf( "_" ) ).equals( id.toString() );
-        }, SurveysSort.TIME, 1, surveyOptions ).stream().findFirst();
+        }, SurveysSort.TIME, 1 , downloadAnswers , surveyOptions ).stream().findFirst();
     }
 
     public Integer saveNewSurvey( Survey survey ) throws IOException{
-        if( survey.getCreator() == null || survey.getCategory() == null || survey.getDate() == null )
+        if( survey.getCreator() == null || survey.getCategory() == null )
             throw new IllegalArgumentException( "Нельзя сохранить такую анкету" );
+        survey.setDate( new Date() );
         findUser( survey.getCreator().getLogin() ).orElseThrow( () -> new IllegalArgumentException( "Анкета без создателя" ) );
         Integer id = Files
                              .list( getSurveyDirectory() )
@@ -321,6 +320,7 @@ public class DAO{
 
     public List<User> listAllUsers( DeserializeUserOptions... options ) throws IOException{
         return Files.list( getUserDirectory() )
+                .filter( path -> !path.toString().substring( getUserDirectoryNameLength() ).startsWith( "." ) )
                 .map( mapPathToUser( options ) )
                 .collect( Collectors.toList() );
     }
@@ -394,7 +394,7 @@ public class DAO{
 
     public void saveNewUserAnswer( UserAnswer userAnswer ) throws IOException{
         findUser( userAnswer.getUser().getLogin() ).orElseThrow( () -> new IllegalArgumentException( "Нет такого пользователя " + userAnswer.getUser().getLogin() ) );
-        Survey survey = findSurvey( userAnswer.getSurvey().getId() , DeserializeSurveyOptions.QUESTIONS ).orElseThrow( () -> new IllegalArgumentException( "Нет такой анкеты " + userAnswer.getSurvey().getId() ) );
+        Survey survey = findSurvey( userAnswer.getSurvey().getId() , false , DeserializeSurveyOptions.QUESTIONS ).orElseThrow( () -> new IllegalArgumentException( "Нет такой анкеты " + userAnswer.getSurvey().getId() ) );
         if( survey.getQuestions().size() != userAnswer.getAnswers().size() )
             throw new IllegalArgumentException( "Несоответствие ответа анкете" );
         for( int i = 0 , end = survey.getQuestions().size() ; i < end ; i++ )
@@ -406,7 +406,7 @@ public class DAO{
                          objectMapper.writeValueAsString( userAnswer.getAnswers() ).getBytes( Charset.forName( "utf-8" ) ) ,
                          StandardOpenOption.CREATE_NEW , StandardOpenOption.WRITE );
         }catch( FileAlreadyExistsException e ){
-            throw new IllegalArgumentException( "Пользователь " + userAnswer.getUser().getLogin() + " уже отвечал на анкету " + userAnswer.getSurvey().getId() );
+            throw new SurveyAlreadyDoneByUserException( userAnswer.getUser().getLogin() , userAnswer.getSurvey().getId() );
         }
     }
 
@@ -438,6 +438,11 @@ public class DAO{
                               } );
     }
 
+    public void deleteUserAnswer( Integer id, String login ) throws IOException{
+        Files.delete( Files.list( getUserAnswerDirectory() )
+                              .filter( path -> path.toString().substring( getUserAnswerDirectoryNameLength() ).equals( login + "_" + id ) )
+                              .findFirst().orElseThrow( () -> new UserAnswerNotFoundException( login, id ) ) );
+    }
 
     private List<UserAnswer> listAllUserAnswersByPredicate( Predicate<Path> predicate , Boolean downloadAnswers )
             throws IOException{
@@ -450,7 +455,7 @@ public class DAO{
                     bdUserAnswer.setSurveyId( Integer.parseInt( str.substring( str.indexOf( "_" ) + 1 ) ) );
                     try{
                         bdUserAnswer.setUser( findUser( bdUserAnswer.getUserLogin() ).orElseThrow( () -> new UserNotFoundException( bdUserAnswer.getUserLogin() ) ) );
-                        bdUserAnswer.setSurvey( findSurvey( bdUserAnswer.getSurveyId() ).orElseThrow( () -> new SurveyNotFoundException( bdUserAnswer.getSurveyId() ) ) );
+                        bdUserAnswer.setSurvey( findSurvey( bdUserAnswer.getSurveyId() , false ).orElseThrow( () -> new SurveyNotFoundException( bdUserAnswer.getSurveyId() ) ) );
                     }catch( IOException e ){
                         e.printStackTrace();
                     }
@@ -475,11 +480,13 @@ public class DAO{
             try{
                 BDCategory bdCategory = objectMapper
                         .readValue( new String( Files.readAllBytes( path ) , Charset.forName( "utf-8" ) ) , BDCategory.class );
-                if( downloadSurveys )
+                if( downloadSurveys ){
+                    Boolean downloadAnswers = surveysSort != SurveysSort.TIME;
                     bdCategory.setSurveys( listSurveysByPredicate( path1 -> {
                         String str = path1.toString().substring( getCategoriesDirectoryNameLength() );
                         return str.substring( str.lastIndexOf( "_" ) + 1 ).equals( bdCategory.getName() );
-                    } , surveysSort , limit ) );
+                    }, surveysSort, limit, downloadAnswers ) );
+                }
                 return bdCategory.toCategory();
             }catch( IOException e ){
                 throw new IllegalArgumentException( "Ошибка чтения" );
@@ -495,7 +502,7 @@ public class DAO{
                 if( options1.contains( DeserializeUserOptions.MADESURVEYS ) ) bdUser.setMadeByUserSurveys( listSurveysByPredicate( path1 -> {
                     String str = path1.toString().substring( getSurveyDirectoryNameLength() );
                     return str.substring( str.indexOf( "_" ) + 1, str.lastIndexOf( "_" ) ).equals( bdUser.getLogin() );
-                }, SurveysSort.TIME, Integer.MAX_VALUE ) );
+                }, SurveysSort.TIME, Integer.MAX_VALUE , false ) );
                 if( options1.contains( DeserializeUserOptions.ANSWERS ) )
                     bdUser.setAnswers( listAllUserAnswersByUserLogin( bdUser.getLogin() , true ) );
                 return bdUser.toUser();

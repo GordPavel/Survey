@@ -14,7 +14,11 @@ public interface SurveyService{
 
     List<Survey> getTop( String sortBy, Integer limit, DeserializeSurveyOptions... options );
 
-    Optional<Survey> getSurveyById( Integer id, DeserializeSurveyOptions... surveyOptions );
+    Optional<Survey> getSurveyById( Integer id, Boolean downloadAnswers , DeserializeSurveyOptions... surveyOptions );
+
+    Optional<Integer> saveSurvey( Survey survey );
+
+    void deleteSurvey( Integer id );
 
     Optional<User> getMadeUser( Integer id, DeserializeUserOptions... options );
 

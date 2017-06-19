@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.ssau.DAO.enums.DeserializeSurveyOptions;
+import ru.ssau.DAO.enums.DeserializeUserOptions;
+import ru.ssau.DAO.enums.SurveysSort;
 import ru.ssau.service.SurveyService;
 import ru.ssau.service.UserService;
 import ru.ssau.service.validation.UserRegistrationValidator;
-import ru.ssau.transport.UserRegistrationForm;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -32,8 +34,12 @@ public class WebController{
     private SurveyService             surveyService;
 
     @RequestMapping( method = RequestMethod.GET )
-    public String start( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
+    public String start( @RequestParam( required = false, defaultValue = "time" ) String sortBy,
                          @RequestParam( required = false, defaultValue = "5" ) Integer limit, Model model ){
+        if( limit < 0 )
+            limit = 0;
+        if( !sortBy.equals( "users" ) && !sortBy.equals( "time" ) )
+            sortBy = "time";
         model.addAttribute( "surveys", surveyService.getTop( sortBy, limit ) );
         return "index";
     }
@@ -54,27 +60,45 @@ public class WebController{
     }
 
     @RequestMapping( value = "/topics", method = RequestMethod.GET )
-    public String topics( @RequestParam( required = false, defaultValue = "users" ) String sortBy,
+    public String topics( @RequestParam( required = false, defaultValue = "true" ) Boolean downloadSurveys,
+                          @RequestParam( required = false, defaultValue = "users" ) String sortBy,
                           @RequestParam( required = false, defaultValue = "3" ) Integer limit, Model model ){
-        // TODO: 16.06.17
+        if( limit < 0 )
+            limit = 0;
+        if( !sortBy.equals( "users" ) || ! sortBy.equals( "time" ) )
+            sortBy = "users";
+        model.addAttribute( "topics",
+                            surveyService.getCategories( downloadSurveys, SurveysSort.valueOf( sortBy ), limit ) );
         return "topics";
     }
 
     @RequestMapping( value = "/topic", method = RequestMethod.GET )
-    public String topic( @RequestParam String name, Model model ){
-        // TODO: 16.06.17
+    public String topic( @RequestParam String name,
+                         @RequestParam( required = false, defaultValue = "true" ) Boolean downloadSurveys,
+                         @RequestParam( required = false, defaultValue = "users" ) String sortBy,
+                         @RequestParam( required = false, defaultValue = "3" ) Integer limit, Model model ){
+        if( limit < 0 )
+            limit = 0;
+        if( !sortBy.equals( "users" ) || ! sortBy.equals( "time" ) )
+            sortBy = "users";
+        model.addAttribute( "topic",
+                            surveyService.getCategoryByName( name, downloadSurveys, SurveysSort.valueOf( sortBy ),
+                                                             limit ) );
         return "topic";
     }
 
     @RequestMapping( value = "/user", method = RequestMethod.GET )
-    public String getUserByLogin( @RequestParam String login, Model model ){
-        // TODO: 16.06.17
+    public String getUserByLogin( @RequestParam String login, Model model,
+                                  @RequestParam DeserializeUserOptions... options ){
+        model.addAttribute( "topic", userService.getUser( login, options ) );
         return "user";
     }
 
     @RequestMapping( value = "/survey", method = RequestMethod.GET )
-    public String survey( @RequestParam Integer id, Model model ){
-        // TODO: 17.05.17 Страница анкеты
+    public String survey( @RequestParam Integer id, Model model,
+                          @RequestParam( required = false, defaultValue = "false" ) Boolean downloadAnswers,
+                          @RequestParam DeserializeSurveyOptions... options ){
+        model.addAttribute( "survey", surveyService.getSurveyById( id, downloadAnswers, options ) );
         return "survey";
     }
 

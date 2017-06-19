@@ -1,5 +1,7 @@
 package ru.ssau.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 public class User{
@@ -73,10 +75,12 @@ public class User{
         this.role = role;
     }
 
+    @JsonIgnore
     public List<UserAnswer> getAnswers(){
         return answers;
     }
 
+    @JsonIgnore
     public void setAnswers( List<UserAnswer> answers ){
         this.answers = answers;
     }

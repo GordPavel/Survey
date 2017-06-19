@@ -3,7 +3,6 @@ package ru.ssau.domain;
 import java.util.List;
 
 public class Category{
-
     private String       name;
     private List<Survey> surveys;
 

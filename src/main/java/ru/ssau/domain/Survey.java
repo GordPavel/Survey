@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Survey{
-
     private Integer          id;
     private String           name;
     private String           comment;
@@ -75,16 +74,18 @@ public class Survey{
         this.comment = comment;
     }
 
+    @JsonIgnore
     public List<UserAnswer> getAnswers(){
         return answers;
     }
 
     @JsonIgnore
     public Integer getUsersDone(){
-        if( answers == null ) throw new IllegalArgumentException( "Ответы не загружены" );
+        if( answers == null ) return 0;
         return answers.size();
     }
 
+    @JsonIgnore
     public void setAnswers( List<UserAnswer> answers ){
         this.answers = answers;
     }

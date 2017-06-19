@@ -7,7 +7,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 import ru.ssau.domain.User;
 import ru.ssau.service.UserService;
-import ru.ssau.transport.UserRegistrationForm;
+import ru.ssau.controller.UserRegistrationForm;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -56,13 +56,20 @@ public class UserRegistrationValidator implements Validator{
         }
     }
 
+//    0: все хорошо
+//    1: логин занят
+//    2: ошибка длины логина
+//    3: ошибка длины пароля
+
     //    Для клиентской формы
-    public boolean validate( User user ){
+    public Integer validate( User user ){
         List<String> usersLogins = userService.getUsers().stream().map( User::getLogin ).collect( Collectors.toList() );
+        if( user.getLogin().isEmpty() || user.getLogin().length() < 6 || user.getLogin().length() > 32 )
+            return 2;
         if( usersLogins.contains( user.getLogin() ) )
-            return false;
+            return 1;
         if( user.getPassword().length() < 6 || user.getPassword().length() > 32 )
-            return false;
-        return true;
+            return 3;
+        return 0;
     }
 }

@@ -1,4 +1,4 @@
-package ru.ssau.transport;
+package ru.ssau.controller;
 
 import org.springframework.web.multipart.MultipartFile;
 
