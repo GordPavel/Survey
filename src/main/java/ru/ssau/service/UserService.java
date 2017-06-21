@@ -12,19 +12,21 @@ import java.util.Optional;
 
 public interface UserService{
 
-    Optional<User> getUser( String login, DeserializeUserOptions... options );
+    Optional<User> getUser( String login, DeserializeUserOptions... options ) throws InterruptedException;
 
-    List<User> getUsers( DeserializeUserOptions... options );
+    void deleteUser( String login ) throws InterruptedException;
 
-    void saveUser( UserRegistrationForm user ) throws IOException;
+    List<User> getUsers( DeserializeUserOptions... options ) throws InterruptedException;
 
-    void saveUser( User user ) throws IOException;
+    void saveUser( UserRegistrationForm user ) throws IOException, InterruptedException;
 
-    List<Survey> getDoneSurveysByLogin( String login );
+    void saveUser( User user ) throws IOException, InterruptedException;
 
-    List<Survey> getMadeSurveysByLogin( String login );
+    List<Survey> getDoneSurveysByLogin( String login ) throws InterruptedException;
 
-    void saveNewUserAnswer( UserAnswer userAnswer ) throws IOException;
+    List<Survey> getMadeSurveysByLogin( String login ) throws InterruptedException;
 
-    void deleteUserAnswer( Integer id, String login  ) throws IOException;
+    void saveNewUserAnswer( UserAnswer userAnswer ) throws IOException, InterruptedException;
+
+    void deleteUserAnswer( Integer id, String login  ) throws IOException, InterruptedException;
 }

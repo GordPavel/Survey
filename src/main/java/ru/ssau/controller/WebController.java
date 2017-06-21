@@ -24,22 +24,26 @@ import java.util.Locale;
 @RequestMapping( "/" )
 public class WebController{
 
+    private final UserRegistrationValidator validator;
+    private final UserService               userService;
+    private final MessageSource             messageSource;
+    private final SurveyService             surveyService;
+
     @Autowired
-    private UserRegistrationValidator validator;
-    @Autowired
-    private UserService               userService;
-    @Autowired
-    private MessageSource             messageSource;
-    @Autowired
-    private SurveyService             surveyService;
+    public WebController( UserRegistrationValidator validator, UserService userService, MessageSource messageSource,
+                          SurveyService surveyService ){
+        this.validator = validator;
+        this.userService = userService;
+        this.messageSource = messageSource;
+        this.surveyService = surveyService;
+    }
 
     @RequestMapping( method = RequestMethod.GET )
     public String start( @RequestParam( required = false, defaultValue = "time" ) String sortBy,
                          @RequestParam( required = false, defaultValue = "5" ) Integer limit, Model model ){
         if( limit < 0 )
             limit = 0;
-        if( !sortBy.equals( "users" ) && !sortBy.equals( "time" ) )
-            sortBy = "time";
+        if( !sortBy.toUpperCase().equals( "USERS" ) && !sortBy.toUpperCase().equals( "TIME" ) ) sortBy = "time";
         model.addAttribute( "surveys", surveyService.getTop( sortBy, limit ) );
         return "index";
     }
@@ -60,15 +64,18 @@ public class WebController{
     }
 
     @RequestMapping( value = "/topics", method = RequestMethod.GET )
-    public String topics( @RequestParam( required = false, defaultValue = "true" ) Boolean downloadSurveys,
-                          @RequestParam( required = false, defaultValue = "users" ) String sortBy,
+    public String topics( @RequestParam( required = false, defaultValue = "false" ) Boolean downloadSurveys,
+                          @RequestParam( required = false, defaultValue = "time" ) String sortBy,
                           @RequestParam( required = false, defaultValue = "3" ) Integer limit, Model model ){
         if( limit < 0 )
             limit = 0;
-        if( !sortBy.equals( "users" ) || ! sortBy.equals( "time" ) )
-            sortBy = "users";
-        model.addAttribute( "topics",
-                            surveyService.getCategories( downloadSurveys, SurveysSort.valueOf( sortBy ), limit ) );
+        if( !sortBy.toUpperCase().equals( "USERS" ) && !sortBy.toUpperCase().equals( "TIME" ) ) sortBy = "time";
+        try{
+            model.addAttribute( "topics",
+                                surveyService.getCategories( downloadSurveys, SurveysSort.valueOf( sortBy ), limit ) );
+        }catch( InterruptedException e ){
+            model.addAttribute( "error" , "Couldn't download topics" );
+        }
         return "topics";
     }
 
@@ -79,26 +86,37 @@ public class WebController{
                          @RequestParam( required = false, defaultValue = "3" ) Integer limit, Model model ){
         if( limit < 0 )
             limit = 0;
-        if( !sortBy.equals( "users" ) || ! sortBy.equals( "time" ) )
-            sortBy = "users";
-        model.addAttribute( "topic",
-                            surveyService.getCategoryByName( name, downloadSurveys, SurveysSort.valueOf( sortBy ),
-                                                             limit ) );
+        if( !sortBy.toUpperCase().equals( "USERS" ) && !sortBy.toUpperCase().equals( "TIME" ) ) sortBy = "time";
+        try{
+            model.addAttribute( "topic",
+                                surveyService.getCategoryByName( name, downloadSurveys, SurveysSort.valueOf( sortBy ),
+                                                                 limit ) );
+        }catch( InterruptedException e ){
+            model.addAttribute( "error" , "Couldn't download topic" );
+        }
         return "topic";
     }
 
     @RequestMapping( value = "/user", method = RequestMethod.GET )
-    public String getUserByLogin( @RequestParam String login, Model model,
-                                  @RequestParam DeserializeUserOptions... options ){
-        model.addAttribute( "topic", userService.getUser( login, options ) );
+    public String getUserByLogin( @RequestParam String login, Model model ){
+        try{
+            model.addAttribute( "topic", userService.getUser( login, DeserializeUserOptions.MADESURVEYS , DeserializeUserOptions.ANSWERS ) );
+        }catch( InterruptedException e ){
+            model.addAttribute( "error" , "Couldn't download user" );
+        }
         return "user";
     }
 
     @RequestMapping( value = "/survey", method = RequestMethod.GET )
-    public String survey( @RequestParam Integer id, Model model,
-                          @RequestParam( required = false, defaultValue = "false" ) Boolean downloadAnswers,
-                          @RequestParam DeserializeSurveyOptions... options ){
-        model.addAttribute( "survey", surveyService.getSurveyById( id, downloadAnswers, options ) );
+    public String survey( @RequestParam Integer id, Model model ){
+        try{
+            model.addAttribute( "survey",
+                                surveyService.getSurveyById( id, DeserializeSurveyOptions.CREATOR,
+                                                             DeserializeSurveyOptions.QUESTIONS,
+                                                             DeserializeSurveyOptions.CATEGORY ) );
+        }catch( InterruptedException e ){
+            model.addAttribute( "error" , "Couldn't download survey" );
+        }
         return "survey";
     }
 
@@ -125,6 +143,8 @@ public class WebController{
                                                     messageSource.getMessage( "File.UploadError", new String[]{},
                                                                               Locale.getDefault() ) ) );
             return "registration";
+        }catch( InterruptedException e ){
+            e.printStackTrace();
         }
         return "redirect:/";
     }

@@ -1,7 +1,10 @@
 package ru.ssau.domain;
 
-public class Answer{
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.Objects;
+
+public class Answer{
     private Integer id;
     private String  name;
     private Integer usersAnswered;
@@ -36,5 +39,18 @@ public class Answer{
 
     public void setUsersAnswered( Integer usersAnswered ){
         this.usersAnswered = usersAnswered;
+    }
+
+    @JsonIgnore
+    public void incrementUsersAnswered(){
+        usersAnswered++;
+    }
+
+    @Override
+    public boolean equals( Object obj ){
+        if( !( obj instanceof Answer ) ) return false;
+        Answer answer = ( Answer ) obj;
+        return Objects.equals( answer.id, this.id ) && Objects.equals( answer.name, this.name ) &&
+               Objects.equals( answer.usersAnswered, this.usersAnswered );
     }
 }

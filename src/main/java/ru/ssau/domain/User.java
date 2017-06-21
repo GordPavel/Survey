@@ -3,6 +3,7 @@ package ru.ssau.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.List;
+import java.util.Objects;
 
 public class User{
 
@@ -91,5 +92,15 @@ public class User{
 
     public void setMadeSurveys( List<Survey> madeSurveys ){
         this.madeSurveys = madeSurveys;
+    }
+
+    @Override
+    public boolean equals( Object obj ){
+        if( !( obj instanceof User ) ) return false;
+        User user = ( User ) obj;
+        return Objects.equals( user.login, this.login ) && Objects.equals( user.password, this.password ) &&
+               Objects.equals( user.name, this.name ) && Objects.equals( user.lastName, this.lastName ) &&
+               Objects.equals( user.role, this.role ) && Objects.equals( user.answers, this.answers ) &&
+               Objects.equals( user.madeSurveys, this.madeSurveys );
     }
 }
