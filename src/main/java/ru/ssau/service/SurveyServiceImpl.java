@@ -87,7 +87,7 @@ public class SurveyServiceImpl implements SurveyService{
                                                  Integer limit ) throws InterruptedException{
         try{
             dao.beginTransaction();
-            Optional<Category> category = dao.findCategory( name, downloadSurveys, surveysSort );
+            Optional<Category> category = dao.findCategory( name, downloadSurveys, surveysSort , limit );
             dao.endTransaction();
             return category;
         }catch( IOException e ){

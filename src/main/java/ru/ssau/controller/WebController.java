@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.ssau.DAO.enums.DeserializeSurveyOptions;
 import ru.ssau.DAO.enums.DeserializeUserOptions;
 import ru.ssau.DAO.enums.SurveysSort;
+import ru.ssau.exceptions.CategoryNotFoundException;
+import ru.ssau.exceptions.SurveyNotFoundException;
+import ru.ssau.exceptions.UserNotFoundException;
 import ru.ssau.service.SurveyService;
 import ru.ssau.service.UserService;
 import ru.ssau.service.validation.UserRegistrationValidator;
@@ -72,7 +75,7 @@ public class WebController{
         if( !sortBy.toUpperCase().equals( "USERS" ) && !sortBy.toUpperCase().equals( "TIME" ) ) sortBy = "time";
         try{
             model.addAttribute( "topics",
-                                surveyService.getCategories( downloadSurveys, SurveysSort.valueOf( sortBy ), limit ) );
+                                surveyService.getCategories( downloadSurveys, SurveysSort.valueOf( sortBy.toUpperCase() ), limit ) );
         }catch( InterruptedException e ){
             model.addAttribute( "error" , "Couldn't download topics" );
         }
@@ -89,8 +92,8 @@ public class WebController{
         if( !sortBy.toUpperCase().equals( "USERS" ) && !sortBy.toUpperCase().equals( "TIME" ) ) sortBy = "time";
         try{
             model.addAttribute( "topic",
-                                surveyService.getCategoryByName( name, downloadSurveys, SurveysSort.valueOf( sortBy ),
-                                                                 limit ) );
+                                surveyService.getCategoryByName( name, downloadSurveys, SurveysSort.valueOf( sortBy.toUpperCase() ),
+                                                                 limit ).orElseThrow( () -> new CategoryNotFoundException( name ) ) );
         }catch( InterruptedException e ){
             model.addAttribute( "error" , "Couldn't download topic" );
         }
@@ -100,7 +103,8 @@ public class WebController{
     @RequestMapping( value = "/user", method = RequestMethod.GET )
     public String getUserByLogin( @RequestParam String login, Model model ){
         try{
-            model.addAttribute( "topic", userService.getUser( login, DeserializeUserOptions.MADESURVEYS , DeserializeUserOptions.ANSWERS ) );
+            model.addAttribute( "user", userService.getUser( login, DeserializeUserOptions.MADESURVEYS , DeserializeUserOptions.ANSWERS )
+                    .orElseThrow( () -> new UserNotFoundException( login ) ) );
         }catch( InterruptedException e ){
             model.addAttribute( "error" , "Couldn't download user" );
         }
@@ -110,14 +114,26 @@ public class WebController{
     @RequestMapping( value = "/survey", method = RequestMethod.GET )
     public String survey( @RequestParam Integer id, Model model ){
         try{
-            model.addAttribute( "survey",
-                                surveyService.getSurveyById( id, DeserializeSurveyOptions.CREATOR,
-                                                             DeserializeSurveyOptions.QUESTIONS,
-                                                             DeserializeSurveyOptions.CATEGORY ) );
+            model.addAttribute( "survey", surveyService.getSurveyById( id, DeserializeSurveyOptions.CREATOR,
+                                                                       DeserializeSurveyOptions.QUESTIONS,
+                                                                       DeserializeSurveyOptions.CATEGORY )
+                    .orElseThrow( () -> new SurveyNotFoundException( id ) ) );
         }catch( InterruptedException e ){
+            e.printStackTrace();
             model.addAttribute( "error" , "Couldn't download survey" );
         }
         return "survey";
+    }
+
+    @RequestMapping( value = "/newSurvey", method = RequestMethod.GET )
+    public String newSurvey( Model model ){
+        try{
+            model.addAttribute( "categories" , surveyService.getCategories( false , SurveysSort.TIME , 0 ) );
+        }catch( InterruptedException e ){
+            e.printStackTrace();
+            model.addAttribute( "error" , "Couldn't download categories" );
+        }
+        return "newSurvey";
     }
 
 //    @RequestMapping( value = "/search" , method = RequestMethod.GET )
@@ -146,6 +162,6 @@ public class WebController{
         }catch( InterruptedException e ){
             e.printStackTrace();
         }
-        return "redirect:/";
+        return "redirect:/login";
     }
 }

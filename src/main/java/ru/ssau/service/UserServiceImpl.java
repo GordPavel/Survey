@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService{
         user.setRole( UserRoles.USER );
         if( !userRegistrationForm.getFile().isEmpty() ) try{
             filesManager.saveFile( userRegistrationForm.getFile().getBytes(),
-                                   userRegistrationForm.getLogin() + ".png" );
+                                   userRegistrationForm.getLogin() );
         }catch( IOException e ){
             e.printStackTrace();
         }

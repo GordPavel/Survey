@@ -220,22 +220,6 @@ public class ClientController{
             return ResponseEntity.status( HttpStatus.TOO_MANY_REQUESTS ).build();
         }
     }
-
-//    @RequestMapping( value = "/topic", method = RequestMethod.GET )
-//    public ResponseEntity<?> getTopic( @RequestParam String name,
-//                                       @RequestParam( required = false, defaultValue = "true" ) Boolean downloadSurveys,
-//                                       @RequestParam( required = false, defaultValue = "time" ) String sortBy,
-//                                       @RequestParam( required = false, defaultValue = "3" ) Integer limit ){
-//        if( limit < 0 ) limit = 0;
-//        if( !sortBy.toUpperCase().equals( "USERS" ) || !sortBy.toUpperCase().equals( "TIME" ) ) sortBy = "TIME";
-//        try{
-//            return ResponseEntity.ok().body(
-//                    surveyService.getCategoryByName( name, downloadSurveys, SurveysSort.valueOf( sortBy ), limit ).orElseThrow( () -> new CategoryNotFoundException( name ) ) );
-//        }catch( InterruptedException e ){
-//            e.printStackTrace();
-//            return ResponseEntity.status( HttpStatus.TOO_MANY_REQUESTS ).build();
-//        }
-//    }
     // Проверено
     @RequestMapping( value = "/doneSurvey", method = RequestMethod.POST )
     public ResponseEntity<?> doneSurvey( @RequestParam String answers, @RequestParam Integer id,
@@ -285,6 +269,7 @@ public class ClientController{
     @RequestMapping( value = "/createdSurvey", method = RequestMethod.POST )
     public ResponseEntity<?> newSurvey( @RequestParam String createdSurvey ){
         try{
+            // TODO: 21.06.17 Валидация
             return ResponseEntity.ok(
                     surveyService.saveSurvey( objectMapper.readValue( createdSurvey, Survey.class ) ).get() );
         }catch( InterruptedException e ){

@@ -223,8 +223,8 @@ public class DAO{
         return listAllCategories( path -> true , downloadSurveys , surveysSort , limit ).collect( Collectors.toList());
     }
 
-    public Optional<Category> findCategory( String name , Boolean downloadSurveys , SurveysSort surveysSort  ) throws IOException{
-        return listAllCategories( path ->  path.toString().substring( getCategoriesDirectoryNameLength() ).equals( name ), downloadSurveys , surveysSort , 1 ).findFirst();
+    public Optional<Category> findCategory( String name , Boolean downloadSurveys , SurveysSort surveysSort , Integer limit  ) throws IOException{
+        return listAllCategories( path ->  path.toString().substring( getCategoriesDirectoryNameLength() ).equals( name ), downloadSurveys , surveysSort , limit ).findFirst();
     }
 
     private void saveCategory( Category category ){
@@ -408,7 +408,7 @@ public class DAO{
                                 bdSurvey.getQuestions().get( j ).getAnswers().get( bdSurvey.getAnswers().get( i ).getAnswers().get( j ) ).incrementUsersAnswered();
                 }
                 if( downloadCategory )
-                    bdSurvey.setCategory( findCategory( bdSurvey.getCategoryName() , false , SurveysSort.TIME )
+                    bdSurvey.setCategory( findCategory( bdSurvey.getCategoryName() , false , SurveysSort.TIME , 0 )
                                                   .orElseThrow( () -> new CategoryNotFoundException( bdSurvey.getCategoryName() ) ) );
                 return bdSurvey.toSurvey();
             }catch( IOException e ){
