@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+import ru.ssau.controller.UserRegistrationForm;
 import ru.ssau.domain.User;
 import ru.ssau.service.UserService;
-import ru.ssau.controller.UserRegistrationForm;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -37,8 +37,12 @@ public class UserRegistrationValidator implements Validator{
         if( user.getLogin().length() < 6 || user.getLogin().length() > 32 )
             errors.rejectValue( "login", "Size.userForm.login" );
 
-        Optional<User> optional = userService.getUser( user.getLogin() );
-        optional.ifPresent( user1 -> errors.rejectValue( "login", "Duplicate.userForm.login" ) );
+        try{
+            Optional<User> optional = userService.getUser( user.getLogin() );
+            optional.ifPresent( user1 -> errors.rejectValue( "login", "Duplicate.userForm.login" ) );
+        }catch( InterruptedException e ){
+            errors.rejectValue( "login" , "userForm.downloadError" );
+        }
 
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password", "NotEmpty" );
         if( user.getPassword().length() < 8 || user.getPassword().length() > 32 )
@@ -62,11 +66,11 @@ public class UserRegistrationValidator implements Validator{
 //    3: ошибка длины пароля
 
     //    Для клиентской формы
-    public Integer validate( User user ){
-        List<String> usersLogins = userService.getUsers().stream().map( User::getLogin ).collect( Collectors.toList() );
+    public Integer validate( User user ) throws InterruptedException{
+        List<String> usersLogin = userService.getUsers().stream().map( User::getLogin ).collect( Collectors.toList() );
         if( user.getLogin().isEmpty() || user.getLogin().length() < 6 || user.getLogin().length() > 32 )
             return 2;
-        if( usersLogins.contains( user.getLogin() ) )
+        if( usersLogin.contains( user.getLogin() ) )
             return 1;
         if( user.getPassword().length() < 6 || user.getPassword().length() > 32 )
             return 3;

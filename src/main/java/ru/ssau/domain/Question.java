@@ -1,6 +1,7 @@
 package ru.ssau.domain;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,5 +49,13 @@ public class Question{
 
     public void setAnswers( List<Answer> answers ){
         this.answers = answers;
+    }
+
+    @Override
+    public boolean equals( Object obj ){
+        if( !( obj instanceof Question ) ) return false;
+        Question question = ( Question ) obj;
+        return Objects.equals( question.id, this.id ) && Objects.equals( question.name, this.name ) &&
+               Objects.equals( question.answers, this.answers );
     }
 }

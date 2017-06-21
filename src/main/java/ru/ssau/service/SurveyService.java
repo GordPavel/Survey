@@ -14,16 +14,18 @@ public interface SurveyService{
 
     List<Survey> getTop( String sortBy, Integer limit, DeserializeSurveyOptions... options );
 
-    Optional<Survey> getSurveyById( Integer id, Boolean downloadAnswers , DeserializeSurveyOptions... surveyOptions );
+    Optional<Survey> getSurveyById( Integer id, DeserializeSurveyOptions... surveyOptions )
+            throws InterruptedException;
 
-    Optional<Integer> saveSurvey( Survey survey );
+    Optional<Integer> saveSurvey( Survey survey ) throws InterruptedException;
 
-    void deleteSurvey( Integer id );
+    void deleteSurvey( Integer id ) throws InterruptedException;
 
-    Optional<User> getMadeUser( Integer id, DeserializeUserOptions... options );
+    Optional<User> getMadeUser( Integer id ) throws InterruptedException;
 
     Optional<Category> getCategoryByName( String name, Boolean downloadSurveys, SurveysSort surveysSort,
-                                          Integer limit );
+                                          Integer limit ) throws InterruptedException;
 
-    List<Category> getCategories( Boolean downloadSurveys , SurveysSort surveysSort , Integer limit );
+    List<Category> getCategories( Boolean downloadSurveys , SurveysSort surveysSort , Integer limit )
+            throws InterruptedException;
 }

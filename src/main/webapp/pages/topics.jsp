@@ -19,6 +19,9 @@
     <div class="article">
         <div id="survey">
             <ol>
+                <c:if test="${not empty error}">
+                    <c:out value="${error}"/>
+                </c:if>
                 <c:forEach items="${topics}" var="topic">
                     <li><a href="<c:url value="/topic?name=${topic.name}"/>">${topic.name}</a></li>
                     <ol>

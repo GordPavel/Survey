@@ -17,6 +17,9 @@
 <c:import url="header.jsp"/>
 <div class="content-bg">
     <div class="article">
+        <c:if test="${not empty error}">
+            <c:out value="${error}"/>
+        </c:if>
         <p style="margin-right:5% "><strong>${topic.name}</strong></p>
         <div id="survey">
             <ol>

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -104,5 +105,15 @@ public class Survey{
 
     public void setCreator( User creator ){
         this.creator = creator;
+    }
+
+    @Override
+    public boolean equals( Object obj ){
+        if( !( obj instanceof Survey ) ) return false;
+        Survey survey = ( Survey ) obj;
+        return Objects.equals( survey.id, this.id ) && Objects.equals( survey.name, this.name ) &&
+               Objects.equals( survey.comment, this.comment ) && Objects.equals( survey.answers, this.answers ) &&
+               Objects.equals( survey.questions, this.questions ) && Objects.equals( survey.creator, this.creator ) &&
+               Objects.equals( survey.date, this.date ) && Objects.equals( survey.category, this.category );
     }
 }

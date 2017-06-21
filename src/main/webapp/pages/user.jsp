@@ -17,6 +17,9 @@
 <c:import url="header.jsp"/>
 <div class="content-bg">
     <div class="article">
+        <c:if test="${not empty error}">
+            <c:out value="${error}"/>
+        </c:if>
         <p><strong>Личный кабинет</strong></p>
     </div>
     <table cellspacing="0" border="2">

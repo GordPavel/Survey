@@ -1,5 +1,5 @@
 package ru.ssau.DAO.enums;
 
 public enum DeserializeSurveyOptions{
-    USERS, QUESTIONS, CREATOR, CATEGORY
+    USERS, QUESTIONS, CREATOR, CATEGORY , STATISTICS
 }
