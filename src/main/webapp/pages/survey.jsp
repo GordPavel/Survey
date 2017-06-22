@@ -24,10 +24,12 @@
     <div class="main">
         <div>
             <c:forEach items="${survey.questions}" var="question">
-                ${question.name}
-                <c:forEach items="${question.answers}" var="answer">
-                    <input type="radio" name="answer" value="a1">${answer.name}<br>
-                </c:forEach>
+                <p><b>${question.name}</b></p>
+                <div>
+                    <c:forEach items="${question.answers}" var="answer">
+                        <input type="radio" name="answer" value="a1">${answer.name}<br>
+                    </c:forEach>
+                </div>
             </c:forEach>
         </div>
     </div>

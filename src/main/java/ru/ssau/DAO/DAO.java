@@ -401,6 +401,7 @@ public class DAO{
                                                        return str.substring( str.indexOf( "_" ) + 1 ).equals( bdSurvey.getId().toString() );
                                                    } )
                                                    .map( mapPathToQuestion() )
+                                                   .sorted( Comparator.comparing( Question::getId ) )
                                                    .collect( Collectors.toList() ) );
                     if( downloadStatistics )
                         for( int i = 0 , j , end = bdSurvey.getAnswers().size() , endJ = bdSurvey.getQuestions().size() ; i < end ; i++ )
@@ -541,7 +542,7 @@ public class DAO{
     }
 
     private Path getSurveyDirectory(){
-        return Paths.get( environment.getProperty( "objectsStorage" ) + environment.getProperty( "surveyStorage" ) );
+        return Paths.get( environment.getProperty( "storage" ) + environment.getProperty( "surveyStorage" ) );
     }
 
     private Integer getSurveyDirectoryNameLength(){
@@ -549,7 +550,7 @@ public class DAO{
     }
 
     private Path getQuestionsDirectory(){
-        return Paths.get( environment.getProperty( "objectsStorage" ) + environment.getProperty( "questionStorage" ) );
+        return Paths.get( environment.getProperty( "storage" ) + environment.getProperty( "questionStorage" ) );
     }
 
     private Integer getQuestionsDirectoryNameLength(){
@@ -557,7 +558,7 @@ public class DAO{
     }
 
     private Path getAnswersDirectory(){
-        return Paths.get( environment.getProperty( "objectsStorage" ) + environment.getProperty( "answerStorage" ) );
+        return Paths.get( environment.getProperty( "storage" ) + environment.getProperty( "answerStorage" ) );
     }
 
     private Integer getAnswersDirectoryNameLength(){
@@ -565,7 +566,7 @@ public class DAO{
     }
 
     private Path getCategoriesDirectory(){
-        return Paths.get( environment.getProperty( "objectsStorage" ) + environment.getProperty( "topicStorage" ) );
+        return Paths.get( environment.getProperty( "storage" ) + environment.getProperty( "topicStorage" ) );
     }
 
     private Integer getCategoriesDirectoryNameLength(){
@@ -573,7 +574,7 @@ public class DAO{
     }
 
     private Path getUserDirectory(){
-        return Paths.get( environment.getProperty( "objectsStorage" ) + environment.getProperty( "userStorage" ) );
+        return Paths.get( environment.getProperty( "storage" ) + environment.getProperty( "userStorage" ) );
     }
 
     private Integer getUserDirectoryNameLength(){
@@ -581,7 +582,7 @@ public class DAO{
     }
 
     private Path getUserAnswerDirectory(){
-        return Paths.get( environment.getProperty( "objectsStorage" ) + environment.getProperty( "userAnswerStorage" ) );
+        return Paths.get( environment.getProperty( "storage" ) + environment.getProperty( "userAnswerStorage" ) );
     }
 
     private Integer getUserAnswerDirectoryNameLength(){
