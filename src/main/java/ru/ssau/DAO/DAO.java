@@ -64,7 +64,7 @@ public class DAO{
     }
 
     public List<Survey> listAllSurveys( SurveysSort surveysSort , Integer limit , DeserializeSurveyOptions... options ) throws IOException{
-        List<DeserializeSurveyOptions> surveyOptions = Arrays.asList( options );
+        List<DeserializeSurveyOptions> surveyOptions = new ArrayList<>( Arrays.asList( options ) );
         if( surveysSort == SurveysSort.USERS )
             surveyOptions.add( DeserializeSurveyOptions.USERS );
         Boolean downloadUsers = surveyOptions.contains( DeserializeSurveyOptions.USERS );

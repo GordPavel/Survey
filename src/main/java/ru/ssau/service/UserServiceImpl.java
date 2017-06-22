@@ -129,4 +129,14 @@ public class UserServiceImpl implements UserService{
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void changeUserName( String login, String newName ){
+        dao.updateUser( login , bdUser -> bdUser.setName( newName ) );
+    }
+
+    @Override
+    public void changeUserLastName( String login, String newLastName ){
+        dao.updateUser( login , bdUser -> bdUser.setLastName( newLastName ) );
+    }
 }

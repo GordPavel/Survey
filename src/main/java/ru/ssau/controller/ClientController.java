@@ -129,7 +129,7 @@ public class ClientController{
     }
 
 //    Проверено
-    @RequestMapping( value = { "/user/doneSurveys" }, method = { RequestMethod.GET } )
+    @RequestMapping( value = "/user/doneSurveys" , method = { RequestMethod.GET } )
     public ResponseEntity<?> getDoneSurveysByLogin( @RequestParam String login ){
         try{
             return ResponseEntity.ok().contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
@@ -142,7 +142,7 @@ public class ClientController{
 
 
 //    Проверено
-    @RequestMapping( value = { "/user/madeSurveys" }, method = { RequestMethod.GET } )
+    @RequestMapping( value = "/user/madeSurveys" , method = { RequestMethod.GET } )
     public ResponseEntity<?> getMadeSurveysByLogin( @RequestParam String login ){
         try{
             return ResponseEntity.ok().contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
@@ -151,6 +151,19 @@ public class ClientController{
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.TOO_MANY_REQUESTS ).build();
         }
+    }
+
+    //    Проверено
+    @RequestMapping( value = "/user/changeName" , method = RequestMethod.POST )
+    public ResponseEntity<?> changeUserName( @RequestParam String login , @RequestParam String newName ){
+        userService.changeUserName( login , newName );
+        return ResponseEntity.ok().build();
+    }
+    //    Проверено
+    @RequestMapping( value = "/user/changeSurname" , method = RequestMethod.POST )
+    public ResponseEntity<?> changeUseLastName( @RequestParam String login , @RequestParam String newSurname ){
+        userService.changeUserLastName( login , newSurname );
+        return ResponseEntity.ok().build();
     }
 
     //   Проверено

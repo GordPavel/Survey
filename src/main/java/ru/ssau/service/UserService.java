@@ -29,4 +29,8 @@ public interface UserService{
     void saveNewUserAnswer( UserAnswer userAnswer ) throws IOException, InterruptedException;
 
     void deleteUserAnswer( Integer id, String login  ) throws IOException, InterruptedException;
+
+    void changeUserName( String login , String newName );
+
+    void changeUserLastName( String login , String newLastName );
 }
