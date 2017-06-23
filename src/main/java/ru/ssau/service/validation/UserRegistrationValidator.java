@@ -67,13 +67,10 @@ public class UserRegistrationValidator implements Validator{
 
     //    Для клиентской формы
     public Integer validate( User user ) throws InterruptedException{
-        List<String> usersLogin = userService.getUsers().stream().map( User::getLogin ).collect( Collectors.toList() );
-        if( user.getLogin().isEmpty() || user.getLogin().length() < 6 || user.getLogin().length() > 32 )
-            return 2;
-        if( usersLogin.contains( user.getLogin() ) )
-            return 1;
-        if( user.getPassword().length() < 6 || user.getPassword().length() > 32 )
-            return 3;
+        List<String> usersLogins = userService.getUsers().stream().map( User::getLogin ).collect( Collectors.toList() );
+        if( usersLogins.contains( user.getLogin() ) ) return 1;
+        if( user.getLogin().isEmpty() || user.getLogin().length() < 6 || user.getLogin().length() > 32 ){return 2;}
+        if( user.getPassword().length() < 6 || user.getPassword().length() > 32 ) return 3;
         return 0;
     }
 }

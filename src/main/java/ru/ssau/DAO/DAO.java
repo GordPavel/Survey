@@ -279,19 +279,17 @@ public class DAO{
 
     public void deleteUser( String login ) throws IOException{
         deleteBDUser( login );
-        Files.list( getSurveyDirectory() )
-                .filter( path -> ! path.toString().substring( getSurveyDirectoryNameLength() ).startsWith( "." ) )
-                .filter( path -> {
-                    String str = path.toString().substring( getSurveyDirectoryNameLength() );
-                    return str.substring( str.indexOf( "_" ) + 1 , str.lastIndexOf( "_" ) ).equals( login );
-                } )
-                .forEach( path -> {
-                    String str = path.toString().substring( getSurveyDirectoryNameLength() );
+        listAllSurveys( path -> {
+            String str = path.toString().substring( getSurveyDirectoryNameLength() );
+            return str.substring( str.indexOf( "_" ) + 1 , str.lastIndexOf( "_" ) ).equals( login );
+        } , SurveysSort.TIME , Integer.MAX_VALUE ,
+                        false , false ,
+                        false , false , false )
+                .forEach( survey -> {
                     try{
-                        deleteSurvey( Integer.parseInt( str.substring( 0 , str.indexOf( "_" ) ) ) );
+                        deleteSurvey( survey.getId() );
                     }catch( IOException e ){
                         e.printStackTrace();
-                        throw new DeserializationException( path );
                     }
                 } );
         Files.list( getUserAnswerDirectory() )

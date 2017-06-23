@@ -24,6 +24,7 @@ import ru.ssau.service.validation.NewUserAnswerValidator;
 
 import java.util.Arrays;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -51,7 +52,7 @@ public class DAOTest{
 
     {
         user = new User();
-        user.setLogin( "user" );
+        user.setLogin( "s3rius" );
         user.setName( "name" );
         user.setLastName( "lastName" );
         user.setPassword( "password" );
@@ -72,7 +73,8 @@ public class DAOTest{
 
     @Test
     public void saveUser() throws Exception{
-        userService.saveUser( user );
+        mockMvc.perform( post( "/client/registration" )
+                                 .param( "newUser", objectMapper.writeValueAsString( user ) ) );
     }
 
     @Test
@@ -99,18 +101,18 @@ public class DAOTest{
 
     @Test
     public void getSurveyByController() throws Exception{
-        MvcResult result = mockMvc.perform( get( "/client/survey" ).param( "id" , String.valueOf( 51 ) )
-        .param( "options" , objectMapper.writeValueAsString( new DeserializeSurveyOptions[]{ DeserializeSurveyOptions.CREATOR,
-                                                                                             DeserializeSurveyOptions.QUESTIONS,
-                                                                                             DeserializeSurveyOptions.CATEGORY,
-                                                                                             DeserializeSurveyOptions.STATISTICS } ) ) ).andReturn();
+        MvcResult result = mockMvc.perform( get( "/client/survey" )
+                                                    .param( "id" , String.valueOf( 50 ) )
+                                                    .param( "options" , objectMapper.writeValueAsString( new DeserializeSurveyOptions[]{
+                                                            DeserializeSurveyOptions.CREATOR,
+                                                            DeserializeSurveyOptions.QUESTIONS,
+                                                            DeserializeSurveyOptions.CATEGORY,
+                                                            DeserializeSurveyOptions.STATISTICS } ) ) )
+                .andReturn();
         Survey survey = objectMapper.readValue( result.getResponse().getContentAsString() , Survey.class );
-        System.out.println( survey.getId() + " " + survey.getName() );
-        System.out.println( survey.getCreator().getLogin() );
-        survey.getQuestions().forEach( question -> {
-            System.out.println( "   " + question.getId() + " " + question.getName() );
-            question.getAnswers().forEach( answer -> System.out.println(
-                    "      " + answer.getId() + " " + answer.getName() + " " + answer.getUsersAnswered() ) );
+        survey.getAnswers().forEach( userAnswer -> {
+            System.out.println( userAnswer.getUser().getLogin() + " -> " + userAnswer.getSurvey().getId() );
+            userAnswer.getAnswers().forEach( System.out::println );
         } );
     }
 
@@ -172,6 +174,6 @@ public class DAOTest{
 
     @Test
     public void deleteUser() throws Exception{
-        userService.deleteUser( "user" );
+        mockMvc.perform( delete( "/client/user" ).param( "login" , "s3rius" ) );
     }
 }
