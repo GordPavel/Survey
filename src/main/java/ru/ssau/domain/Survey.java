@@ -75,7 +75,6 @@ public class Survey{
         this.comment = comment;
     }
 
-    @JsonIgnore
     public List<UserAnswer> getAnswers(){
         return answers;
     }
@@ -86,7 +85,6 @@ public class Survey{
         return answers.size();
     }
 
-    @JsonIgnore
     public void setAnswers( List<UserAnswer> answers ){
         this.answers = answers;
     }

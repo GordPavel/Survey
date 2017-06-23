@@ -44,8 +44,7 @@ public class WebController{
     @RequestMapping( method = RequestMethod.GET )
     public String start( @RequestParam( required = false, defaultValue = "time" ) String sortBy,
                          @RequestParam( required = false, defaultValue = "5" ) Integer limit, Model model ){
-        if( limit < 0 )
-            limit = 0;
+        if( limit < 0 ) limit = 0;
         if( !sortBy.toUpperCase().equals( "USERS" ) && !sortBy.toUpperCase().equals( "TIME" ) ) sortBy = "time";
         model.addAttribute( "surveys", surveyService.getTop( sortBy, limit ) );
         return "index";
@@ -70,14 +69,14 @@ public class WebController{
     public String topics( @RequestParam( required = false, defaultValue = "false" ) Boolean downloadSurveys,
                           @RequestParam( required = false, defaultValue = "time" ) String sortBy,
                           @RequestParam( required = false, defaultValue = "3" ) Integer limit, Model model ){
-        if( limit < 0 )
-            limit = 0;
+        if( limit < 0 ) limit = 0;
         if( !sortBy.toUpperCase().equals( "USERS" ) && !sortBy.toUpperCase().equals( "TIME" ) ) sortBy = "time";
         try{
-            model.addAttribute( "topics",
-                                surveyService.getCategories( downloadSurveys, SurveysSort.valueOf( sortBy.toUpperCase() ), limit ) );
+            model.addAttribute( "topics", surveyService.getCategories( downloadSurveys,
+                                                                       SurveysSort.valueOf( sortBy.toUpperCase() ),
+                                                                       limit ) );
         }catch( InterruptedException e ){
-            model.addAttribute( "error" , "Couldn't download topics" );
+            model.addAttribute( "error", "Couldn't download topics" );
         }
         return "topics";
     }
@@ -87,15 +86,15 @@ public class WebController{
                          @RequestParam( required = false, defaultValue = "true" ) Boolean downloadSurveys,
                          @RequestParam( required = false, defaultValue = "users" ) String sortBy,
                          @RequestParam( required = false, defaultValue = "3" ) Integer limit, Model model ){
-        if( limit < 0 )
-            limit = 0;
+        if( limit < 0 ) limit = 0;
         if( !sortBy.toUpperCase().equals( "USERS" ) && !sortBy.toUpperCase().equals( "TIME" ) ) sortBy = "time";
         try{
-            model.addAttribute( "topic",
-                                surveyService.getCategoryByName( name, downloadSurveys, SurveysSort.valueOf( sortBy.toUpperCase() ),
-                                                                 limit ).orElseThrow( () -> new CategoryNotFoundException( name ) ) );
+            model.addAttribute( "topic", surveyService.getCategoryByName( name, downloadSurveys,
+                                                                          SurveysSort.valueOf( sortBy.toUpperCase() ),
+                                                                          limit ).orElseThrow(
+                    () -> new CategoryNotFoundException( name ) ) );
         }catch( InterruptedException e ){
-            model.addAttribute( "error" , "Couldn't download topic" );
+            model.addAttribute( "error", "Couldn't download topic" );
         }
         return "topic";
     }
@@ -103,10 +102,11 @@ public class WebController{
     @RequestMapping( value = "/user", method = RequestMethod.GET )
     public String getUserByLogin( @RequestParam String login, Model model ){
         try{
-            model.addAttribute( "user", userService.getUser( login, DeserializeUserOptions.MADESURVEYS , DeserializeUserOptions.ANSWERS )
-                    .orElseThrow( () -> new UserNotFoundException( login ) ) );
+            model.addAttribute( "user", userService.getUser( login, DeserializeUserOptions.MADESURVEYS,
+                                                             DeserializeUserOptions.ANSWERS ).orElseThrow(
+                    () -> new UserNotFoundException( login ) ) );
         }catch( InterruptedException e ){
-            model.addAttribute( "error" , "Couldn't download user" );
+            model.addAttribute( "error", "Couldn't download user" );
         }
         return "user";
     }
@@ -116,11 +116,11 @@ public class WebController{
         try{
             model.addAttribute( "survey", surveyService.getSurveyById( id, DeserializeSurveyOptions.CREATOR,
                                                                        DeserializeSurveyOptions.QUESTIONS,
-                                                                       DeserializeSurveyOptions.CATEGORY )
-                    .orElseThrow( () -> new SurveyNotFoundException( id ) ) );
+                                                                       DeserializeSurveyOptions.CATEGORY ).orElseThrow(
+                    () -> new SurveyNotFoundException( id ) ) );
         }catch( InterruptedException e ){
             e.printStackTrace();
-            model.addAttribute( "error" , "Couldn't download survey" );
+            model.addAttribute( "error", "Couldn't download survey" );
         }
         return "survey";
     }
@@ -128,10 +128,10 @@ public class WebController{
     @RequestMapping( value = "/newSurvey", method = RequestMethod.GET )
     public String newSurvey( Model model ){
         try{
-            model.addAttribute( "categories" , surveyService.getCategories( false , SurveysSort.TIME , 0 ) );
+            model.addAttribute( "categories", surveyService.getCategories( false, SurveysSort.TIME, 0 ) );
         }catch( InterruptedException e ){
             e.printStackTrace();
-            model.addAttribute( "error" , "Couldn't download categories" );
+            model.addAttribute( "error", "Couldn't download categories" );
         }
         return "newSurvey";
     }

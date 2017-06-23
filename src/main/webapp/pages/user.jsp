@@ -41,10 +41,10 @@
             <td>
                 <div class="article">
                     <div class="scroll"><pre>
-    <c:forEach items="${user.answers}" var="survey">
-        <li><a href="<c:url value="/survey?id=${survey.id}"/>">${surve.name}</a></li>
-    </c:forEach>
-  </pre>
+                        <c:forEach items="${user.answers}" var="userAnswer">
+                            <li><a href="<c:url value="/survey?id=${userAnswer.survey.id}"/>">${userAnswer.survey.name}</a></li>
+                        </c:forEach>
+                      </pre>
                     </div>
                 </div>
             </td>

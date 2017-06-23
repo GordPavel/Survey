@@ -84,11 +84,18 @@ public class ClientController{
             throws JsonProcessingException{
         try{
             if( id == null ) return ResponseEntity.status( HttpStatus.BAD_REQUEST ).build();
-            DeserializeSurveyOptions[] deserializeOptions = objectMapper.readValue( options,
-                                                                                    DeserializeSurveyOptions[].class );
-            return surveyService.getSurveyById( id, deserializeOptions ).<ResponseEntity<?>>map(
-                    survey -> ResponseEntity.ok().contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
-                            survey ) ).orElseGet( () -> ResponseEntity.notFound().build() );
+            return surveyService.getSurveyById( id, objectMapper.readValue( options,
+                                                                            DeserializeSurveyOptions[].class ) )
+                    .map( survey -> {
+                        try{
+                            return ResponseEntity.ok().contentType( MediaType.APPLICATION_JSON_UTF8 )
+                                    .body( objectMapper.writeValueAsString( survey ) );
+                        }catch( JsonProcessingException e ){
+                            e.printStackTrace();
+                            return ResponseEntity.unprocessableEntity().build();
+                        }
+                    } )
+                    .orElseGet( () -> ResponseEntity.notFound().build() );
         }catch( InterruptedException e ){
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.TOO_MANY_REQUESTS ).build();
