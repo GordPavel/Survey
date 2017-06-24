@@ -13,6 +13,13 @@
     <link href="<c:url value="/pages/css/fonts.css" />" rel="stylesheet">
     <link href="<c:url value="/pages/css/style.css" />" rel="stylesheet">
     <link href="<c:url value="/pages/libs/bootstrap/bootstrap.css" />" rel="stylesheet">
+    <link href="<c:url value="/pages/js/needle-1.4.2/lib/auth.js"/>" rel="stylesheet">
+    <link href="<c:url value="/pages/js/needle-1.4.2/lib/cookies.js"/>" rel="stylesheet">
+    <link href="<c:url value="/pages/js/needle-1.4.2/lib/decoder.js"/>" rel="stylesheet">
+    <link href="<c:url value="/pages/js/needle-1.4.2/lib/multipart.js"/>" rel="stylesheet">
+    <link href="<c:url value="/pages/js/needle-1.4.2/lib/needle.js"/>" rel="stylesheet">
+    <link href="<c:url value="/pages/js/needle-1.4.2/lib/parsers.js"/>" rel="stylesheet">
+    <link href="<c:url value="/pages/js/needle-1.4.2/lib/querystring.js"/>" rel="stylesheet">
 </head>
 <body>
 <%-- Изменчивое количество категорий, подсвечивает send , не отправляется--%>
@@ -27,12 +34,19 @@
             <br>
             <b>Выберите тему анкеты :</b>
             <select id = "kater">
+                <c:set var="i" value="0"/>
                 <c:forEach items="${categories}" var="category">
-                    <option>${category.name}</option>
+                    <option id="category_${i}">${category.name}</option>
+                    <c:set var="i" value="${i+1}"/>
                 </c:forEach>
+                <%--<option>1 тема </option>--%>
+                <%--<option>2 тема</option>--%>
+                <%--<option>3 тема</option>--%>
+                <%--<option>4 тема</option>--%>
             </select>
             <br>
             <sec:authentication  property="principal.username" var="login"  scope="request"/>
+            <div id="userLogin" style="display: none">${login}</div>
             <div id = "lolkek">
                 <b>Название вопроса:</b>
                 <input type="text" size="40"> <input type="submit" id = "delq" onclick="deleteqwestion(this)" value="Удалить вопрос" form='send'>
@@ -71,8 +85,6 @@
                     lop[lop.length - 2].id = "dela" + n + 0;
                     lop[1].id = "delq" + n;
                     hall.parentNode.insertBefore(lo,hall);
-                    var kiuy = document.getElementById("gg");
-                    kiuy = "sdsg";
                     ++n;
                     ++chit;
                 }
@@ -272,19 +284,25 @@
                         }
                         qwests[i] = new Question(i, sss, ans);
                     }
-                    var survey = new Survey(naza, komm, qwests, new User( ${login} ), kat);
-                    var gggg = JSON.stringify(survey);
+                    var logi = new User(document.getElementById("userLogin"));
+                    var survey = new Survey(naza, komm, qwests, logi, kat);
+                    var createdSurvey = JSON.stringify(survey);
                     var request = new XMLHttpRequest();
+                    var createdS = "createdSurvey=" + JSON.stringify(survey);
                     request.withCredentials = true;
+
                     request.open('POST', "http://localhost:8080/survey/client/createdSurvey/", true);
-                    // 	request.setRequestHeader('Content-type', 'application/json');
+//                    request.setRequestHeader("Content-type", "application/json; charset=utf-8");
+//                    request.setRequestHeader("Content-length", createdSurvey.length);
+//                    request.setRequestHeader("Connection", "close");
+//                    request.setRequestHeader('Content-type', 'application/json');
                     request.onreadystatechange = function ()
                     {
                         if (request.status == 200)
                             alert("заебись");
                     }
-                    request.send(gggg);
-                    alert(gggg);
+                    request.send(createdSurvey);
+                    alert(createdSurvey);
                 }
             </script>
         </form>

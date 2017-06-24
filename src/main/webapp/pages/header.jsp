@@ -44,7 +44,7 @@
             </form>
         </div>
         <sec:authorize access="isAuthenticated()">
-            <sec:authentication  property="principal.username" var="login"  scope="request"  />
+            <sec:authentication  property="principal.username" var="login"  scope="request"/>
             <div class="btn-group">
                 <b><a href="<c:url value="/user?login=${login}"/>">${login}</a></b>
                 <img class="top_profile_img"

@@ -32,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
                 .authorizeRequests()
 
-                .antMatchers( "/user" ).authenticated()
+                .antMatchers( "/user" , "/newSurvey" ).authenticated()
 
                 .anyRequest().permitAll();
 

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,6 @@ import ru.ssau.DAO.enums.SurveysSort;
 import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
 import ru.ssau.domain.UserAnswer;
-import ru.ssau.exceptions.SurveyAlreadyDoneByUserException;
 import ru.ssau.service.SurveyService;
 import ru.ssau.service.UserService;
 import ru.ssau.service.filesmanager.FilesManager;
@@ -30,6 +30,13 @@ import ru.ssau.service.validation.NewUserAnswerValidator;
 import ru.ssau.service.validation.UserRegistrationValidator;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -43,6 +50,8 @@ public class ClientController{
     private final ObjectMapper              objectMapper;
     private final MessageSource             messageSource;
     private final NewUserAnswerValidator    userAnswerValidator;
+    @Autowired
+    private       Environment               environment;
 
 
     @Autowired
@@ -200,22 +209,11 @@ public class ClientController{
     public ResponseEntity<?> newUser( @RequestParam( "newUser" ) String JSONUser ){
         try{
             User user = objectMapper.readValue( JSONUser, User.class );
-            switch( validator.validate( user ) ){
-                case 0:
-                    userService.saveUser( user );
-                    return ResponseEntity.ok().build();
-                case 1:
-                    return ResponseEntity.badRequest().contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
-                            "Логин занят" );
-                case 2:
-                    return ResponseEntity.badRequest().contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
-                            "Логин должен быть больше 6 и меньше 32 символов" );
-                case 3:
-                    return ResponseEntity.badRequest().contentType( MediaType.APPLICATION_JSON_UTF8 ).body(
-                            "Пароль должен быть больше 6 и меньше 32 символов" );
-                default:
-                    return ResponseEntity.badRequest().build();
-            }
+            int  status;
+            if( ( status = validator.validate( user ) ) == 0 ){
+                userService.saveUser( user );
+                return ResponseEntity.ok().build();
+            }else return ResponseEntity.status( status ).build();
         }catch( InterruptedException e ){
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.TOO_MANY_REQUESTS ).build();
@@ -301,6 +299,20 @@ public class ClientController{
         }
     }
 
+    @RequestMapping( value = "/exception" , method = RequestMethod.POST )
+    public void getErrors( @RequestParam String message ){
+        try{
+            String name = DateTimeFormatter.ofPattern( "dd.MM.yyyy" ).format( LocalDate.now() );
+            Boolean addOrCreate = Files.list( getExceptionsDirectory() ).anyMatch( path -> path.toString().substring( getExceptionsDirectoryNameLength() ).equals( name ) );
+            StandardOpenOption option = addOrCreate ? StandardOpenOption.APPEND : StandardOpenOption.CREATE_NEW;
+            String add = addOrCreate ? "\n" : "";
+            Files.write( Paths.get( getExceptionsDirectory() + "/" + name ) ,
+                         ( message + "\n" + add ).getBytes( Charset.forName( "utf-8" ) ) , option );
+        }catch( IOException e ){
+            e.printStackTrace();
+        }
+    }
+
     //   Проверено
     @RequestMapping( value = "/img", method = RequestMethod.GET )
     public ResponseEntity<?> getImage( @RequestParam String id ) throws IOException{
@@ -326,6 +338,13 @@ public class ClientController{
     public ResponseEntity<?> deletePic( @RequestParam( value = "login" ) String location ) throws IOException{
         filesManager.deleteFile( location );
         return ResponseEntity.ok().build();
+    }
+
+    private Path getExceptionsDirectory(){
+        return Paths.get( environment.getProperty( "storage" ) + environment.getProperty( "exceptions" ) );
+    }
+    private Integer getExceptionsDirectoryNameLength(){
+        return getExceptionsDirectory().toString().length() + 1;
     }
 }
 

@@ -24,9 +24,7 @@ import ru.ssau.service.validation.NewUserAnswerValidator;
 
 import java.util.Arrays;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @RunWith( SpringJUnit4ClassRunner.class )
 @ContextConfiguration( classes = WebAppConfig.class )
@@ -36,7 +34,7 @@ public class DAOTest{
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    private MockMvc      mockMvc     ;
+    private MockMvc mockMvc;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private User     user;
@@ -44,15 +42,15 @@ public class DAOTest{
     private Survey   survey;
 
     @Autowired
-    private SurveyService surveyService;
+    private SurveyService          surveyService;
     @Autowired
     private NewUserAnswerValidator userAnswerValidator;
     @Autowired
-    private UserService   userService;
+    private UserService            userService;
 
     {
         user = new User();
-        user.setLogin( "s3rius" );
+        user.setLogin( "login4" );
         user.setName( "name" );
         user.setLastName( "lastName" );
         user.setPassword( "password" );
@@ -73,8 +71,9 @@ public class DAOTest{
 
     @Test
     public void saveUser() throws Exception{
-        mockMvc.perform( post( "/client/registration" )
-                                 .param( "newUser", objectMapper.writeValueAsString( user ) ) );
+        System.out.println( mockMvc.perform( post( "/client/registration" )
+                                                     .param( "newUser", objectMapper.writeValueAsString( user ) ) )
+                                    .andReturn().getResponse().getStatus() );
     }
 
     @Test
@@ -94,22 +93,21 @@ public class DAOTest{
         survey.setCategory( category );
         String createdSurvey = objectMapper.writeValueAsString( survey );
         mockMvc.perform(
-                post( "/client/createdSurvey" )
-                        .contentType( MediaType.APPLICATION_JSON_UTF8 )
-                        .param( "createdSurvey", createdSurvey ) );
+                post( "/client/createdSurvey" ).contentType( MediaType.APPLICATION_JSON_UTF8 ).param( "createdSurvey",
+                                                                                                      createdSurvey ) );
     }
 
     @Test
     public void getSurveyByController() throws Exception{
-        MvcResult result = mockMvc.perform( get( "/client/survey" )
-                                                    .param( "id" , String.valueOf( 50 ) )
-                                                    .param( "options" , objectMapper.writeValueAsString( new DeserializeSurveyOptions[]{
-                                                            DeserializeSurveyOptions.CREATOR,
-                                                            DeserializeSurveyOptions.QUESTIONS,
-                                                            DeserializeSurveyOptions.CATEGORY,
-                                                            DeserializeSurveyOptions.STATISTICS } ) ) )
-                .andReturn();
-        Survey survey = objectMapper.readValue( result.getResponse().getContentAsString() , Survey.class );
+        MvcResult result = mockMvc.perform(
+                get( "/client/survey" ).param( "id", String.valueOf( 50 ) ).param( "options",
+                                                                                   objectMapper.writeValueAsString(
+                                                                                           new DeserializeSurveyOptions[]{
+                                                                                                   DeserializeSurveyOptions.CREATOR ,
+                                                                                                   DeserializeSurveyOptions.QUESTIONS ,
+                                                                                                   DeserializeSurveyOptions.CATEGORY ,
+                                                                                                   DeserializeSurveyOptions.STATISTICS } ) ) ).andReturn();
+        Survey survey = objectMapper.readValue( result.getResponse().getContentAsString(), Survey.class );
         survey.getAnswers().forEach( userAnswer -> {
             System.out.println( userAnswer.getUser().getLogin() + " -> " + userAnswer.getSurvey().getId() );
             userAnswer.getAnswers().forEach( System.out::println );
@@ -118,13 +116,12 @@ public class DAOTest{
 
     @Test
     public void saveUserAnswer() throws Exception{
-        String login =  userService.getUser( "pvgordeev" ).get().getLogin();
-        String id = surveyService.getSurveyById( 51 ).get().getId().toString();
-        String answers = objectMapper.writeValueAsString( Arrays.asList( 1, 2, 0, 3, 1, 3 , 4 , 0 , 2 , 0 ) );
-        mockMvc.perform( post( "/client/doneSurvey" ).contentType( MediaType.APPLICATION_JSON_UTF8 )
-                                 .param( "login", login )
-                                 .param( "id", id )
-                                 .param( "answers", answers ) );
+        String login   = userService.getUser( "pvgordeev" ).get().getLogin();
+        String id      = surveyService.getSurveyById( 51 ).get().getId().toString();
+        String answers = objectMapper.writeValueAsString( Arrays.asList( 1, 2, 0, 3, 1, 3, 4, 0, 2, 0 ) );
+        mockMvc.perform( post( "/client/doneSurvey" ).contentType( MediaType.APPLICATION_JSON_UTF8 ).param( "login",
+                                                                                                            login ).param(
+                "id", id ).param( "answers", answers ) );
     }
 
     @Test
@@ -174,6 +171,11 @@ public class DAOTest{
 
     @Test
     public void deleteUser() throws Exception{
-        mockMvc.perform( delete( "/client/user" ).param( "login" , "s3rius" ) );
+        mockMvc.perform( delete( "/client/user" ).param( "login", "s3rius" ) );
+    }
+
+    @Test
+    public void addError() throws Exception{
+        mockMvc.perform( post( "/client/exception" ).param( "message" , "exception" ) );
     }
 }
