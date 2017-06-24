@@ -43,6 +43,21 @@ public class Survey{
         } ).limit( ( int )( 1 + ( long ) ( Math.random() * ( 11 - 1 ) ) ) ).collect( Collectors.toList() );
     }
 
+    public Survey( Integer id, String name, String comment , User creator , Category category ){
+        this.id = id;
+        this.name = name;
+        this.comment = comment;
+        this.creator = creator;
+        this.category = category;
+        this.questions = Stream.iterate( new Question( 1 ), new UnaryOperator<Question>(){
+            int i = 0;
+            @Override
+            public Question apply( Question question ){
+                return new Question( ++i );
+            }
+        } ).limit( ( int )( 1 + ( long ) ( Math.random() * ( 11 - 1 ) ) ) ).collect( Collectors.toList() );
+    }
+
     public Integer getId(){
         return id;
     }

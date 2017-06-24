@@ -117,7 +117,7 @@ public class ClientController{
     //   Проверено
     @RequestMapping( value = "/user", method = RequestMethod.GET )
     public ResponseEntity<?> getUserByLogin( @RequestParam String login,
-                                             @RequestParam( required = false, value = "[]" ) String options ){
+                                             @RequestParam( required = false, defaultValue = "[]" ) String options ){
         try{
             DeserializeUserOptions[] deserializeUserOptions = objectMapper.readValue( options,
                                                                                       DeserializeUserOptions[].class );

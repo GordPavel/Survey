@@ -61,9 +61,9 @@ public class UserRegistrationValidator implements Validator{
     }
 
 //    0: все хорошо
-//    1: логин занят
-//    2: ошибка длины логина
-//    3: ошибка длины пароля
+//    420: логин занят
+//    422: ошибка длины логина
+//    421: ошибка длины пароля
 
     //    Для клиентской формы
     public Integer validate( User user ) throws InterruptedException{
