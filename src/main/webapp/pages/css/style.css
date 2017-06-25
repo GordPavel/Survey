@@ -17,11 +17,9 @@ html, body {
     font-size: 108%;
     line-height: 187%;
     background-image: url(../images/bg.png);
-/*    background-size: cover; */
 }
 
 .header  {
-   
     height: 25%;
     position: relative; 
    }
@@ -33,7 +31,6 @@ html, body {
     background:   url(../images/head.png);
     border-radius:30px;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
-    padding: 1.7% 1.9% 1.1% 2.5%;
     margin-top: 5%;
     margin-left: 4%;
 }
@@ -43,19 +40,19 @@ html, body {
     top: 0%;
     left: 0%;
     width: 245px;
+    height: 80px;
 }
-
+/* расположение главной тем и о нас */
 .menu ul{
     float:left;
-    margin-left: 20% ;
-/* расположение главной тем и о нас ; 
-    */
-
+    margin-left: 300px;
+    margin-top: 20px;
+    width: 600px;
 }
 
 .header .menu ul li{
     display: inline-block; 
-    padding: 0% 2% 0% 2%;
+    padding: 10px 20px;
 }
 
 .header .menu ul li a{ 
