@@ -13,6 +13,46 @@
     <link href="<c:url value="/pages/css/fonts.css" />" rel="stylesheet">
     <link href="<c:url value="/pages/css/style.css" />" rel="stylesheet">
     <link href="<c:url value="/pages/libs/bootstrap/bootstrap.css" />" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+for(var i = 0; i < 5/*колчество вопросов*/; ++i)
+{
+var nediv = document.createElement("div");
+var fre = document.createElement("canvas");
+fre.id = "popChart" + i;
+fre.width = 300;
+fre.height = 200;
+nediv.appendChild(fre);
+ok.parentNode.insertBefore(nediv,ok);
+var popCanvas = $("#popChart" + i);
+var popCanvas = document.getElementById("popChart" + i);
+var popCanvas = document.getElementById("popChart" + i).getContext("2d");
+var mass = ["China", "India", "United States", "Indonesia", "Brazil"]; 
+var mass1 = [1379302771, 1281935911, 326625791, 260580739, 207353391];
+     
+var barChart = new Chart(popCanvas, {
+  type: 'pie',
+  data: {
+    labels: mass,
+      
+    datasets: [{
+      label: 'Population',
+      data: mass1,
+        strokeColor: "rgba(220, 220, 220, 0.92)",
+      backgroundColor: [
+        '#FE6DA8',
+        '#56B7F1',
+        '#CDA67F',
+        '#FED70E"',
+        'rgba(153, 102, 255, 0.6)'
+      ]
+    }]
+  }
+});
+}
+
+  </script>
 </head>
 <body>
 <c:import url="header.jsp"/>
