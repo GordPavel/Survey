@@ -24,12 +24,14 @@
     <div class="main">
         <div>
             <sec:authentication  property="principal.username" var="login"  scope="request"/>
+            <c:set var="i" value="0"/>
             <c:forEach items="${survey.questions}" var="question">
                 <p><b>${question.name}</b></p>
                 <div>
                     <c:forEach items="${question.answers}" var="answer">
                         <input type="radio" name="answer${question.id}" value="a1"> ${answer.name}<br>
                     </c:forEach>
+                    <c:set var="i" value="${i+1}"/>
                 </div>
             </c:forEach>
         </div>
@@ -92,7 +94,6 @@
             {
                 if(kekerrt[j].checked == "1")
                 {
-                    //debugger;
                     kekerrt[j].checked = false;
                 }
             }

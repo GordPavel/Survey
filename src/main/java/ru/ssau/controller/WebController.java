@@ -1,5 +1,7 @@
 package ru.ssau.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
@@ -34,14 +36,16 @@ public class WebController{
     private final UserService               userService;
     private final MessageSource             messageSource;
     private final SurveyService             surveyService;
+    private final ObjectMapper              objectMapper;
 
     @Autowired
     public WebController( UserRegistrationValidator validator, UserService userService, MessageSource messageSource,
-                          SurveyService surveyService ){
+                          SurveyService surveyService, ObjectMapper objectMapper ){
         this.validator = validator;
         this.userService = userService;
         this.messageSource = messageSource;
         this.surveyService = surveyService;
+        this.objectMapper = objectMapper;
     }
 
     @RequestMapping( method = RequestMethod.GET )
@@ -122,6 +126,7 @@ public class WebController{
                                                          DeserializeSurveyOptions.CATEGORY,
                                                          DeserializeSurveyOptions.STATISTICS )
                     .orElseThrow( () -> new SurveyNotFoundException( id ) );
+            SurveyStatistics surveyStatistics;
             if( principal != null ){
                 String login = principal.getName();
                 if( ! userService.hasUserAnsweredOnSurvey( new UserAnswer( survey ,
@@ -130,13 +135,19 @@ public class WebController{
                     model.addAttribute( "survey", survey );
                     return "answerOnSurvey";
                 }
-                model.addAttribute( "survey", new SurveyStatistics( survey , login ) );
+                surveyStatistics = new SurveyStatistics( survey , login );
+                model.addAttribute( "survey", surveyStatistics );
+                model.addAttribute( "statistics", objectMapper.writeValueAsString( surveyStatistics ) );
                 return "surveyStatistics";
             }
-            model.addAttribute( "survey", new SurveyStatistics( survey ) );
+            surveyStatistics = new SurveyStatistics( survey );
+            model.addAttribute( "survey", surveyStatistics );
+            model.addAttribute( "statistics", objectMapper.writeValueAsString( surveyStatistics ) );
         }catch( InterruptedException e ){
             e.printStackTrace();
             model.addAttribute( "error", "Couldn't download survey" );
+        }catch( JsonProcessingException e ){
+            e.printStackTrace();
         }
         return "surveyStatistics";
     }
