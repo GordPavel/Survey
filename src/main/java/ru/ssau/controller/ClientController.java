@@ -50,15 +50,14 @@ public class ClientController{
     private final ObjectMapper              objectMapper;
     private final MessageSource             messageSource;
     private final NewUserAnswerValidator    userAnswerValidator;
-    @Autowired
-    private       Environment               environment;
+    private final Environment               environment;
 
 
     @Autowired
     public ClientController( SurveyService surveyService, UserService userService, FilesManager filesManager,
                              UserRegistrationValidator validator, ShaPasswordEncoder passwordEncoder,
                              ObjectMapper objectMapper, @Qualifier( "messageSource" ) MessageSource messageSource,
-                             NewUserAnswerValidator userAnswerValidator ){
+                             NewUserAnswerValidator userAnswerValidator, Environment environment ){
         this.surveyService = surveyService;
         this.userService = userService;
         this.filesManager = filesManager;
@@ -67,6 +66,7 @@ public class ClientController{
         this.objectMapper = objectMapper;
         this.messageSource = messageSource;
         this.userAnswerValidator = userAnswerValidator;
+        this.environment = environment;
     }
 
     //   Проверено

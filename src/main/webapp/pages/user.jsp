@@ -32,7 +32,7 @@
                 <div class="article">
                     <div class="scroll"><pre>
                         <c:forEach items="${user.madeSurveys}" var="survey">
-                            <li><a href="<c:url value="/survey?id=${survey.id}"/>">${surve.name}</a></li>
+                            <li><a href="<c:url value="/survey?id=${survey.id}"/>">${survey.name}</a></li>
                         </c:forEach>
  </pre>
                     </div>

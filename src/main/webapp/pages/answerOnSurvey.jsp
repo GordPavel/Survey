@@ -24,15 +24,13 @@
     <div class="main">
         <div>
             <sec:authentication  property="principal.username" var="login"  scope="request"/>
-            <c:set var="i" value="0"/>
             <c:forEach items="${survey.questions}" var="question">
                 <p><b>${question.name}</b></p>
                 <div>
                     <c:forEach items="${question.answers}" var="answer">
-                        <input type="radio" name="answer${i}" value="a1"> ${answer.name}<br>
+                        <input type="radio" name="answer${question.id}" value="a1"> ${answer.name}<br>
                     </c:forEach>
                 </div>
-                <c:set var="i" value="${i+1}"/>
             </c:forEach>
         </div>
         <div id="qweslenght" style="display: none">${i}</div>

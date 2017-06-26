@@ -104,10 +104,13 @@ public class DAOTest{
 
     @Test
     public void getSurvey() throws Exception{
-        String id = "15";
+        String id = "0";
         String loadOptions = objectMapper.writeValueAsString( new DeserializeSurveyOptions[]{ DeserializeSurveyOptions.CREATOR , DeserializeSurveyOptions.CATEGORY , DeserializeSurveyOptions.QUESTIONS , DeserializeSurveyOptions.STATISTICS } );
-        Survey survey = objectMapper.readValue( mockMvc.perform( get( "/client/survey" ).param( "id" , id ).param( "options" , loadOptions ) )
-                                                           .andReturn().getResponse().getContentAsString() , Survey.class );
+        String surveyString = mockMvc.perform( get( "/client/survey" ).param( "id" , id ).param( "options" , loadOptions ) )
+                .andReturn().getResponse().getContentAsString();
+        System.out.println( surveyString );
+        System.out.println();
+        Survey survey = objectMapper.readValue( surveyString , Survey.class );
         System.out.println( survey.getId() + " " + survey.getName() + " " + survey.getComment() + " " + survey.getCreator().getLogin() + " " + survey.getCategory().getName() );
         survey.getQuestions().forEach( question -> {
             System.out.println( "   " + question.getId() + " " + question.getName() );

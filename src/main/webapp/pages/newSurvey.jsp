@@ -13,16 +13,8 @@
     <link href="<c:url value="/pages/css/fonts.css" />" rel="stylesheet">
     <link href="<c:url value="/pages/css/style.css" />" rel="stylesheet">
     <link href="<c:url value="/pages/libs/bootstrap/bootstrap.css" />" rel="stylesheet">
-    <link href="<c:url value="/pages/js/needle-1.4.2/lib/auth.js"/>" rel="stylesheet">
-    <link href="<c:url value="/pages/js/needle-1.4.2/lib/cookies.js"/>" rel="stylesheet">
-    <link href="<c:url value="/pages/js/needle-1.4.2/lib/decoder.js"/>" rel="stylesheet">
-    <link href="<c:url value="/pages/js/needle-1.4.2/lib/multipart.js"/>" rel="stylesheet">
-    <link href="<c:url value="/pages/js/needle-1.4.2/lib/needle.js"/>" rel="stylesheet">
-    <link href="<c:url value="/pages/js/needle-1.4.2/lib/parsers.js"/>" rel="stylesheet">
-    <link href="<c:url value="/pages/js/needle-1.4.2/lib/querystring.js"/>" rel="stylesheet">
 </head>
 <body>
-<%-- Изменчивое количество категорий, подсвечивает send , не отправляется--%>
 <c:import url="header.jsp"/><div class = "content-bg">
     <div class = "article">
         <p><strong>Новая анкета</strong></p>
@@ -276,22 +268,27 @@
                     var xmlhttp = new XMLHttpRequest();
                     xmlhttp.open('POST', "/survey/client/createdSurvey", true);
                     xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    var newAnswer;
                     xmlhttp.onreadystatechange = function() {
                         if (xmlhttp.readyState == 4) {
                             if(xmlhttp.status == 200) {
-                                document.location.href = "/survey";//тут должна быть ссылка по переходу на статистику
+                                newAnswer = xmlhttp.responseText;
+                                document.location.href = "/survey/survey?id=" + newAnswer ;//тут должна быть ссылка по переходу на статистику
                                 return;
                             }
                         }
                     };
                     xmlhttp.send('createdSurvey=' + encodeURIComponent(createdSurvey));
                 }
+                function canselb() {
+                    document.location.href = "/survey";
+                }
             </script>
         </form>
     </div>
     <div class="sum">
         <input type="submit" value="Сохранить изменения" onclick = "saveanswer()" form='send'>
-        <input type="submit" value="Отмена" form='send'>
+        <input type="submit" onclick="canselb()" value="Отмена" form='send'>
     </div>
 </div>
 <c:import url="footer.jsp"/>

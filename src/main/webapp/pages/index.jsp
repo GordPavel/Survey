@@ -18,7 +18,7 @@
 <c:import url="header.jsp"/>
 <div class="content-bg">
     <div class="article">
-        <p><strong>Анкеты ТОП 5</strong></p>
+        <p><strong>Анкеты ТОП </strong></p>
         <div id="survey">
             <ol>
                 <c:forEach items="${surveys}" var="survey">

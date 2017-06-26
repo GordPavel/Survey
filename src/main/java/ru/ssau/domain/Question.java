@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Question{
-
     private Integer      id;
     private String       name;
     private List<Answer> answers;
