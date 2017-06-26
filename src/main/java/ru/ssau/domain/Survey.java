@@ -36,14 +36,15 @@ public class Survey{
         comment = "test";
         questions = Stream.iterate( new Question( 1 ), new UnaryOperator<Question>(){
             int i = 0;
+
             @Override
             public Question apply( Question question ){
                 return new Question( ++i );
             }
-        } ).limit( ( int )( 1 + ( long ) ( Math.random() * ( 11 - 1 ) ) ) ).collect( Collectors.toList() );
+        } ).limit( ( int ) ( 1 + ( long ) ( Math.random() * ( 11 - 1 ) ) ) ).collect( Collectors.toList() );
     }
 
-    public Survey( Integer id, String name, String comment , User creator , Category category ){
+    public Survey( Integer id, String name, String comment, User creator, Category category ){
         this.id = id;
         this.name = name;
         this.comment = comment;
@@ -51,11 +52,12 @@ public class Survey{
         this.category = category;
         this.questions = Stream.iterate( new Question( 1 ), new UnaryOperator<Question>(){
             int i = 0;
+
             @Override
             public Question apply( Question question ){
                 return new Question( ++i );
             }
-        } ).limit( ( int )( 1 + ( long ) ( Math.random() * ( 11 - 1 ) ) ) ).collect( Collectors.toList() );
+        } ).limit( ( int ) ( 1 + ( long ) ( Math.random() * ( 11 - 1 ) ) ) ).collect( Collectors.toList() );
     }
 
     public Integer getId(){
@@ -124,9 +126,8 @@ public class Survey{
     public boolean equals( Object obj ){
         if( !( obj instanceof Survey ) ) return false;
         Survey survey = ( Survey ) obj;
-        return Objects.equals( survey.id, this.id ) && Objects.equals( survey.name, this.name ) &&
-               Objects.equals( survey.comment, this.comment ) && Objects.equals( survey.answers, this.answers ) &&
-               Objects.equals( survey.questions, this.questions ) && Objects.equals( survey.creator, this.creator ) &&
-               Objects.equals( survey.date, this.date ) && Objects.equals( survey.category, this.category );
+        return Objects.equals( survey.name, this.name ) && Objects.equals( survey.comment, this.comment ) &&
+               Objects.equals( survey.answers, this.answers ) && Objects.equals( survey.questions, this.questions ) &&
+               Objects.equals( survey.creator, this.creator ) && Objects.equals( survey.category, this.category );
     }
 }

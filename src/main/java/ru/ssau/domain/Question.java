@@ -55,7 +55,7 @@ public class Question{
     public boolean equals( Object obj ){
         if( !( obj instanceof Question ) ) return false;
         Question question = ( Question ) obj;
-        return Objects.equals( question.id, this.id ) && Objects.equals( question.name, this.name ) &&
+        return Objects.equals( question.name, this.name ) &&
                Objects.equals( question.answers, this.answers );
     }
 }

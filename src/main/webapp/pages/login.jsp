@@ -27,10 +27,10 @@
         <div class="fieldset">
             <label>Логин</label>
             <input type='text' name='login' placeholder='Логин' <c:if test="${not empty error}">style="color: red" </c:if> required autofocus
-                   value="admin"><span></span>
+                   value="s3rius"><span></span>
             <br>
             <label>Пароль</label>
-            <input type='password' name='password' placeholder='Пароль' required value="1234"><span></span>
+            <input type='password' name='password' placeholder='Пароль' required value="19216211"><span></span>
             <br>
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </div>

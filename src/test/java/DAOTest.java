@@ -13,11 +13,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import ru.ssau.DAO.enums.DeserializeSurveyOptions;
 import ru.ssau.config.WebAppConfig;
-import ru.ssau.domain.Category;
-import ru.ssau.domain.Survey;
-import ru.ssau.domain.User;
-import ru.ssau.domain.UserRoles;
+import ru.ssau.domain.*;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -38,8 +36,6 @@ public class DAOTest{
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private Map<String, User>     users      = new HashMap<>();
-    private Map<String, Category> categoties = new HashMap<>();
-    private Map<String, Survey>   surveys    = new HashMap<>();
     @Autowired
     private ShaPasswordEncoder passwordEncoder;
 
@@ -107,8 +103,67 @@ public class DAOTest{
     }
 
     @Test
-    public void deleteSurvey() throws Exception{
-        String deletingLogin = "login7";
+    public void getSurvey() throws Exception{
+        String id = "15";
+        String loadOptions = objectMapper.writeValueAsString( new DeserializeSurveyOptions[]{ DeserializeSurveyOptions.CREATOR , DeserializeSurveyOptions.CATEGORY , DeserializeSurveyOptions.QUESTIONS , DeserializeSurveyOptions.STATISTICS } );
+        Survey survey = objectMapper.readValue( mockMvc.perform( get( "/client/survey" ).param( "id" , id ).param( "options" , loadOptions ) )
+                                                           .andReturn().getResponse().getContentAsString() , Survey.class );
+        System.out.println( survey.getId() + " " + survey.getName() + " " + survey.getComment() + " " + survey.getCreator().getLogin() + " " + survey.getCategory().getName() );
+        survey.getQuestions().forEach( question -> {
+            System.out.println( "   " + question.getId() + " " + question.getName() );
+            question.getAnswers().forEach( answer -> {
+                System.out.println( "       " + answer.getId() + " " + answer.getName() + " " + answer.getUsersAnswered() );
+            } );
+        } );
+    }
+
+    @Test
+    public void getNewSurvey() throws Exception{
+        String surveyName = "name";
+        String surveyComment = "comment";
+        String login = "kate97";
+
+        User user = objectMapper.readValue( mockMvc.perform( get( "/client/user" ).param( "login" , login ) ).andReturn()
+                                                    .getResponse().getContentAsString() , User.class );
+        Category category = new ArrayList<Category>( objectMapper.readValue( mockMvc.perform( get( "/client/topics" ).param( "downloadSurveys" , "false" ) )
+                                                                                     .andReturn().getResponse().getContentAsString() ,
+                                                                             new TypeReference<List<Category>>(){} ) ).get( ( int ) ( Math.random() * ( 18 ) ) );
+        String loadOptions = objectMapper.writeValueAsString( new DeserializeSurveyOptions[]{ DeserializeSurveyOptions.CREATOR , DeserializeSurveyOptions.CATEGORY , DeserializeSurveyOptions.QUESTIONS } );
+        Survey survey = new Survey( null , surveyName , surveyComment , user , category );
+        String id = mockMvc.perform( post( "/client/createdSurvey" ).param( "createdSurvey" , objectMapper.writeValueAsString( survey ) ) ).andReturn().getResponse().getContentAsString();
+        Survey getSurvey = objectMapper.readValue( mockMvc.perform( get( "/client/survey" ).param( "id" , id ).param( "options" , loadOptions ) )
+                                                           .andReturn().getResponse().getContentAsString() , Survey.class );
+        Assert.assertTrue( getSurvey.equals( survey ) );
+    }
+
+    @Test
+    public void userAnswer() throws Exception{
+        String login = "login12";
+        String id = "14";
+        String loadOptions = objectMapper.writeValueAsString( new DeserializeSurveyOptions[]{ DeserializeSurveyOptions.CREATOR , DeserializeSurveyOptions.CATEGORY , DeserializeSurveyOptions.QUESTIONS } );
+        Survey survey = objectMapper.readValue( mockMvc.perform( get( "/client/survey" ).param( "id" , id ).param( "options" , loadOptions ) )
+                                                           .andReturn().getResponse().getContentAsString() , Survey.class );
+        List<Integer> answers = new LinkedList<>();
+        for( Question q : survey.getQuestions() )
+            answers.add( ( int ) ( ( Math.random() * ( q.getAnswers().size() ) ) ) );
+        Boolean alreadyDoneByThisUser = Files.list( Paths.get( "/survey/userAnswer" ) ).anyMatch( path -> path.toString().substring( "/survey/userAnswer".length() + 1 ).equals( login + "_" + id ) );
+        Integer status = mockMvc.perform( post( "/client/doneSurvey" ).param( "login" , login ).param( "id" , id ).param( "answers" , objectMapper.writeValueAsString( answers ) ) ).andReturn().getResponse().getStatus();
+        Assert.assertEquals( alreadyDoneByThisUser ? 450 : 200 , status.intValue() );
+        loadOptions = objectMapper.writeValueAsString( new DeserializeSurveyOptions[]{ DeserializeSurveyOptions.CREATOR , DeserializeSurveyOptions.CATEGORY , DeserializeSurveyOptions.QUESTIONS , DeserializeSurveyOptions.STATISTICS } );
+        Survey newSurvey = objectMapper.readValue( mockMvc.perform( get( "/client/survey" ).param( "id" , id ).param( "options" , loadOptions ) )
+                                                        .andReturn().getResponse().getContentAsString() , Survey.class );
+        System.out.println( newSurvey.getId() + " " + newSurvey.getName() + " " + newSurvey.getComment() + " " + newSurvey.getCreator().getLogin() + " " + newSurvey.getCategory().getName() );
+        newSurvey.getQuestions().forEach( question -> {
+            System.out.println( "   " + question.getId() + " " + question.getName() );
+            question.getAnswers().forEach( answer -> {
+                System.out.println( "       " + answer.getId() + " " + answer.getName() + " " + answer.getUsersAnswered() );
+            } );
+        } );
+    }
+
+    @Test
+    public void deleteLogin() throws Exception{
+        String deletingLogin = "login15";
         final List<Integer> indexesOfDeletedSurveys = Files.list( Paths.get( "/survey/survey" ) )
                 .filter( path -> !path.endsWith( ".DS_Store" ) )
                 .filter( path -> {
@@ -147,4 +202,6 @@ public class DAOTest{
     public void addError() throws Exception{
         mockMvc.perform( post( "/client/exception" ).param( "message", "exception" ) );
     }
+
+
 }

@@ -33,4 +33,6 @@ public interface UserService{
     void changeUserName( String login , String newName );
 
     void changeUserLastName( String login , String newLastName );
+
+    Boolean hasUserAnsweredOnSurvey( UserAnswer userAnswer );
 }

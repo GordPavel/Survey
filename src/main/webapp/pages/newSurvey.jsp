@@ -34,15 +34,9 @@
             <br>
             <b>Выберите тему анкеты :</b>
             <select id = "kater">
-                <c:set var="i" value="0"/>
                 <c:forEach items="${categories}" var="category">
-                    <option id="category_${i}">${category.name}</option>
-                    <c:set var="i" value="${i+1}"/>
+                    <option id="${category.name}">${category.name}</option>
                 </c:forEach>
-                <%--<option>1 тема </option>--%>
-                <%--<option>2 тема</option>--%>
-                <%--<option>3 тема</option>--%>
-                <%--<option>4 тема</option>--%>
             </select>
             <br>
             <sec:authentication  property="principal.username" var="login"  scope="request"/>
@@ -184,9 +178,9 @@
                     this.id = null;
                     this.name = name;
                     this.comment = comment;
-                    this.users = null;
+                    this.answers = null;
                     this.questions = questions;
-                    this.madeByUser = madeByUser;
+                    this.creator = madeByUser;
                     this.date = null;
                     this.category = category;
                 }
@@ -199,7 +193,12 @@
                     this.password = null;
                     this.madeSurveys = null;
                     this.role = null;
-                    this.doneSurveys = null;
+                    this.answers = null;
+                }
+                
+                function Category(name) {
+                    this.name = name;
+                    this.surveys = null;
                 }
 
                 function saveanswer()
@@ -217,21 +216,8 @@
                     var naza = document.getElementById("nazvanket").value;
                     var str12 = new Array();
                     var kat;
-                    switch(document.getElementById("kater").options.selectedIndex)
-                    {
-                        case(0):
-                            kat = "category1";
-                            break;
-                        case(1):
-                            kat = "category2";
-                            break;
-                        case(2):
-                            kat = "category3";
-                            break;
-                        case(4):
-                            kat = "category4";
-                            break;
-                    }
+                    var jki = document.getElementById("kater");
+                    kat = jki.options[jki.selectedIndex].id;
                     var k = 0;
                     for(var i = 0; i <= n; ++i)
                     {
@@ -284,25 +270,21 @@
                         }
                         qwests[i] = new Question(i, sss, ans);
                     }
-                    var logi = new User(document.getElementById("userLogin"));
-                    var survey = new Survey(naza, komm, qwests, logi, kat);
+                    var logi = new User(document.getElementById("userLogin").innerText);
+                    var survey = new Survey(naza, komm, qwests, logi, new Category(kat));
                     var createdSurvey = JSON.stringify(survey);
-                    var request = new XMLHttpRequest();
-                    var createdS = "createdSurvey=" + JSON.stringify(survey);
-                    request.withCredentials = true;
-
-                    request.open('POST', "http://localhost:8080/survey/client/createdSurvey/", true);
-//                    request.setRequestHeader("Content-type", "application/json; charset=utf-8");
-//                    request.setRequestHeader("Content-length", createdSurvey.length);
-//                    request.setRequestHeader("Connection", "close");
-//                    request.setRequestHeader('Content-type', 'application/json');
-                    request.onreadystatechange = function ()
-                    {
-                        if (request.status == 200)
-                            alert("заебись");
-                    }
-                    request.send(createdSurvey);
-                    alert(createdSurvey);
+                    var xmlhttp = new XMLHttpRequest();
+                    xmlhttp.open('POST', "/survey/client/createdSurvey", true);
+                    xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    xmlhttp.onreadystatechange = function() {
+                        if (xmlhttp.readyState == 4) {
+                            if(xmlhttp.status == 200) {
+                                document.location.href = "/survey";//тут должна быть ссылка по переходу на статистику
+                                return;
+                            }
+                        }
+                    };
+                    xmlhttp.send('createdSurvey=' + encodeURIComponent(createdSurvey));
                 }
             </script>
         </form>

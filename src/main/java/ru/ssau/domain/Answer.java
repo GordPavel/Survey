@@ -50,7 +50,10 @@ public class Answer{
     public boolean equals( Object obj ){
         if( !( obj instanceof Answer ) ) return false;
         Answer answer = ( Answer ) obj;
-        return Objects.equals( answer.id, this.id ) && Objects.equals( answer.name, this.name ) &&
-               Objects.equals( answer.usersAnswered, this.usersAnswered );
+        if( ! Objects.equals( answer.name, this.name ) )
+            return false;
+        if( this.usersAnswered != null && answer.usersAnswered != null && Objects.equals( answer.usersAnswered, this.usersAnswered ) )
+            return false;
+        return true;
     }
 }

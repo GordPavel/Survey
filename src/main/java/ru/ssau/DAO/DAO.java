@@ -407,7 +407,7 @@ public class DAO{
                                 bdSurvey.getQuestions().get( j ).getAnswers().get( bdSurvey.getAnswers().get( i ).getAnswers().get( j ) ).incrementUsersAnswered();
                 }
                 if( downloadCategory )
-                    bdSurvey.setCategory( findCategory( bdSurvey.getCategoryName() , false , SurveysSort.TIME , 0 )
+                    bdSurvey.setCategory( findCategory( bdSurvey.getCategoryName() , false , SurveysSort.TIME , 1 )
                                                   .orElseThrow( () -> new CategoryNotFoundException( bdSurvey.getCategoryName() ) ) );
                 return bdSurvey.toSurvey();
             }catch( IOException e ){
@@ -445,10 +445,12 @@ public class DAO{
         return path -> {
             try{
                 BDCategory bdCategory = objectMapper.readValue( new String( Files.readAllBytes( path ) , Charset.forName( "utf-8" ) ), BDCategory.class );
-                if( downloadSurveys ) bdCategory.setSurveys( listAllSurveys( path1 -> {
-                    String str = path1.toString().substring( getSurveyDirectoryNameLength() );
-                    return str.substring( str.lastIndexOf( "_" ) + 1 ).equals( bdCategory.getName() );
-                }, surveysSort, limit, false, false, false, false, false ).collect( Collectors.toList() ) );
+                if( downloadSurveys ){
+                    bdCategory.setSurveys( listAllSurveys( path1 -> {
+                        String str = path1.toString().substring( getSurveyDirectoryNameLength() );
+                        return str.substring( str.lastIndexOf( "_" ) + 1 ).equals( bdCategory.getName() );
+                    }, surveysSort, limit, false, false, false, false, false ).collect( Collectors.toList() ) );
+                }
                 return bdCategory.toCategory();
             }catch( IOException e ){
                 e.printStackTrace();

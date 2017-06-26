@@ -5,13 +5,13 @@ import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.ssau.DAO.DAO;
 import ru.ssau.DAO.enums.DeserializeUserOptions;
+import ru.ssau.controller.UserRegistrationForm;
 import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
 import ru.ssau.domain.UserAnswer;
 import ru.ssau.domain.UserRoles;
 import ru.ssau.exceptions.UserNotFoundException;
 import ru.ssau.service.filesmanager.FilesManager;
-import ru.ssau.controller.UserRegistrationForm;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,8 +87,7 @@ public class UserServiceImpl implements UserService{
         user.setLastName( userRegistrationForm.getLastName() );
         user.setRole( UserRoles.USER );
         if( !userRegistrationForm.getFile().isEmpty() ) try{
-            filesManager.saveFile( userRegistrationForm.getFile().getBytes(),
-                                   userRegistrationForm.getLogin() );
+            filesManager.saveFile( userRegistrationForm.getFile().getBytes(), userRegistrationForm.getLogin() );
         }catch( IOException e ){
             e.printStackTrace();
         }
@@ -132,11 +131,16 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void changeUserName( String login, String newName ){
-        dao.updateUser( login , bdUser -> bdUser.setName( newName ) );
+        dao.updateUser( login, bdUser -> bdUser.setName( newName ) );
     }
 
     @Override
     public void changeUserLastName( String login, String newLastName ){
-        dao.updateUser( login , bdUser -> bdUser.setLastName( newLastName ) );
+        dao.updateUser( login, bdUser -> bdUser.setLastName( newLastName ) );
+    }
+
+    @Override
+    public Boolean hasUserAnsweredOnSurvey( UserAnswer userAnswer ){
+        return dao.isUserAnswerAlreadyExists( userAnswer );
     }
 }

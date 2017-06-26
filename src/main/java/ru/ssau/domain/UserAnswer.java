@@ -11,6 +11,11 @@ public class UserAnswer{
     public UserAnswer(){
     }
 
+    public UserAnswer( Survey survey, User user ){
+        this.survey = survey;
+        this.user = user;
+    }
+
     public Survey getSurvey(){
         return survey;
     }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.ssau.DAO.enums.DeserializeSurveyOptions;
 import ru.ssau.DAO.enums.DeserializeUserOptions;
 import ru.ssau.DAO.enums.SurveysSort;
+import ru.ssau.domain.UserAnswer;
 import ru.ssau.exceptions.CategoryNotFoundException;
 import ru.ssau.exceptions.SurveyNotFoundException;
 import ru.ssau.exceptions.UserNotFoundException;
@@ -21,6 +22,7 @@ import ru.ssau.service.UserService;
 import ru.ssau.service.validation.UserRegistrationValidator;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Locale;
 
 @Controller
@@ -112,17 +114,29 @@ public class WebController{
     }
 
     @RequestMapping( value = "/survey", method = RequestMethod.GET )
-    public String survey( @RequestParam Integer id, Model model ){
+    public String survey( @RequestParam Integer id, Principal principal , Model model ){
         try{
+            if( principal != null ){
+                String login = principal.getName();
+                if( ! userService.hasUserAnsweredOnSurvey( new UserAnswer( surveyService.getSurveyById( id ).orElseThrow( () -> new SurveyNotFoundException( id ) ) ,
+                                                                         userService.getUser( login ).orElseThrow( () -> new UserNotFoundException( login ) ) ) ) ){
+                    model.addAttribute( "survey", surveyService.getSurveyById( id, DeserializeSurveyOptions.CREATOR,
+                                                                               DeserializeSurveyOptions.QUESTIONS,
+                                                                               DeserializeSurveyOptions.CATEGORY )
+                            .orElseThrow( () -> new SurveyNotFoundException( id ) ) );
+                    return "answerOnSurvey";
+                }
+            }
             model.addAttribute( "survey", surveyService.getSurveyById( id, DeserializeSurveyOptions.CREATOR,
                                                                        DeserializeSurveyOptions.QUESTIONS,
-                                                                       DeserializeSurveyOptions.CATEGORY ).orElseThrow(
-                    () -> new SurveyNotFoundException( id ) ) );
+                                                                       DeserializeSurveyOptions.CATEGORY,
+                                                                       DeserializeSurveyOptions.STATISTICS )
+                    .orElseThrow( () -> new SurveyNotFoundException( id ) ) );
         }catch( InterruptedException e ){
             e.printStackTrace();
             model.addAttribute( "error", "Couldn't download survey" );
         }
-        return "survey";
+        return "surveyStatistics";
     }
 
     @RequestMapping( value = "/newSurvey", method = RequestMethod.GET )
