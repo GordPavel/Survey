@@ -146,7 +146,7 @@ html, body {
 }
 
 .content-bg .article li a {
-    margin-left: 35%;
+    margin-left: 5%;
     color: darkred;
     font-weight: 600;/*жирный текст*/
     font-size: 200%; 
