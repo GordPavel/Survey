@@ -18,6 +18,13 @@ public class UserDetailsServiceImpl implements UserDetailsService{
     @Autowired
     private UserService userService;
 
+    /***
+     *
+     * @param login of user to find
+     * @return UserDetails of user
+     * @see UserDetails
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername( String login ) throws UsernameNotFoundException{
         try{

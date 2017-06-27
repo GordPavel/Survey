@@ -48,6 +48,19 @@ public class WebController{
         this.objectMapper = objectMapper;
     }
 
+    /***
+     *
+     * /***
+     *
+     * @param sortBy how to sort all surveys
+     *               @see SurveysSort
+     *               , default = by time to faster loading
+     * @param limit how many surveys download , default = 5
+     *
+     * @param model contains List od surveys on attribute surveys
+     *
+     * @return index page
+     */
     @RequestMapping( method = RequestMethod.GET )
     public String start( @RequestParam( required = false, defaultValue = "time" ) String sortBy,
                          @RequestParam( required = false, defaultValue = "5" ) Integer limit, Model model ){
@@ -57,11 +70,22 @@ public class WebController{
         return "index";
     }
 
+    /***
+     *
+     * @return info page
+     */
     @RequestMapping( value = "/info", method = RequestMethod.GET )
     public String info(){
         return "info";
     }
 
+    /***
+     *
+     * @param error contains all errors on login form
+     * @param logout status of logout of system
+     * @param model contains all errors by attribute error and status of logout on attribute on msg
+     * @return
+     */
     @RequestMapping( value = "/login", method = RequestMethod.GET )
     public String signInPage( @RequestParam( value = "error", required = false ) String error,
                               @RequestParam( value = "logout", required = false ) String logout, Model model ){
@@ -72,6 +96,14 @@ public class WebController{
         return "login";
     }
 
+    /***
+     *
+     * @param downloadSurveys if you want too download all surveys, contains in topic
+     * @param sortBy type of sorting of all topics and surveys in each topic
+     * @param limit max  size of List of surveys in topic
+     * @param model contains all topics on attribute topics
+     * @return topics page
+     */
     @RequestMapping( value = "/topics", method = RequestMethod.GET )
     public String topics( @RequestParam( required = false, defaultValue = "false" ) Boolean downloadSurveys,
                           @RequestParam( required = false, defaultValue = "time" ) String sortBy,
@@ -88,6 +120,15 @@ public class WebController{
         return "topics";
     }
 
+    /***
+     *
+     * @param name name of topic what to download
+     * @param downloadSurveys if you want too download all surveys, contains in topic
+     * @param sortBy type of sorting of all topics and surveys in each topic
+     * @param limit max  size of List of surveys in topic
+     * @param model contains topic on attribute topic
+     * @return topic page
+     */
     @RequestMapping( value = "/topic", method = RequestMethod.GET )
     public String topic( @RequestParam String name,
                          @RequestParam( required = false, defaultValue = "true" ) Boolean downloadSurveys,
@@ -106,6 +147,12 @@ public class WebController{
         return "topic";
     }
 
+    /***
+     *
+     * @param login login of user to download
+     * @param model contains user on attribute user
+     * @return user page
+     */
     @RequestMapping( value = "/user", method = RequestMethod.GET )
     public String getUserByLogin( @RequestParam String login, Model model ){
         try{
@@ -118,6 +165,34 @@ public class WebController{
         return "user";
     }
 
+    /***
+     *
+     * @param login login of user to delete from database,
+     * @param model contains error text on attribute error
+     * @return redirect to logout or user page if couldn't delete
+     */
+    @RequestMapping( value = "/deleteUser" , method = RequestMethod.GET )
+    public String deleteUserByLogin( @RequestParam String login , Model model ){
+        try{
+            userService.deleteUser( login );
+        }catch( InterruptedException e ){
+            e.printStackTrace();
+            model.addAttribute( "error" , "You haven't been deleted because of too many clients" );
+            return "user";
+        }
+        return "redirect:/logout";
+    }
+
+    /***
+     *
+     * if user hasn't authenticated, he can see only statistics, if authenticated but hasn't answers on this survey,
+     * he can answers on this and see the statistics and his own answers
+     *
+     * @param id of survey to download
+     * @param principal need to take user login to answer on survey
+     * @param model contains survey statistics or survey on attribute survey and JSON string of survey statistics on attribute statistics
+     * @return survey page
+     */
     @RequestMapping( value = "/survey", method = RequestMethod.GET )
     public String survey( @RequestParam Integer id, Principal principal , Model model ){
         try{
@@ -152,6 +227,11 @@ public class WebController{
         return "surveyStatistics";
     }
 
+    /***
+     *
+     * @param model contains categories to choose on making survey
+     * @return newSurvey Page
+     */
     @RequestMapping( value = "/newSurvey", method = RequestMethod.GET )
     public String newSurvey( Model model ){
         try{
@@ -163,12 +243,25 @@ public class WebController{
         return "newSurvey";
     }
 
+    /***
+     *
+     * @param model contains user form for registrations
+     * @return registration page
+     */
     @RequestMapping( value = "/registration", method = RequestMethod.GET )
     public String registration( Model model ){
         model.addAttribute( "userForm", new UserRegistrationForm() );
         return "registration";
     }
 
+    /***
+     *
+     * Firstly we check user's data, check duplicate of login, length of login and password and format of downloading file ,if it exists
+     *
+     * @param userForm container of user data,
+     * @param bindingResult have all types of errors on each parameter
+     * @return registrations page with errors or login page if alright
+     */
     @RequestMapping( value = "/registration", method = RequestMethod.POST )
     public String registration( @ModelAttribute( "userForm" ) UserRegistrationForm userForm,
                                 BindingResult bindingResult ){

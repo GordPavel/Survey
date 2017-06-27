@@ -63,9 +63,10 @@
                 mass1[j] = pipiska[j].usersAnswered;
                 d = j;
             }
-            mass[d + 1] = "Прочее";
-            mass1[d + 1] = qwestions[i].other;
-
+            if(qwestions[i].other != null) {
+                mass[d + 1] = "Прочее";
+                mass1[d + 1] = qwestions[i].other;
+            }
 
             var barChart = new Chart(popCanvas, {
                 type: 'doughnut',

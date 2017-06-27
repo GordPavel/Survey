@@ -2,9 +2,8 @@ package ru.ssau.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.ssau.DAO.DAO;
+import ru.ssau.DAO.DatabaseUtils;
 import ru.ssau.DAO.enums.DeserializeSurveyOptions;
-import ru.ssau.DAO.enums.DeserializeUserOptions;
 import ru.ssau.DAO.enums.SurveysSort;
 import ru.ssau.domain.Category;
 import ru.ssau.domain.Survey;
@@ -16,19 +15,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/***
+ * class to connect survey requests and database
+ */
+
 @Service
 public class SurveyServiceImpl implements SurveyService{
 
     @Autowired
-    private DAO dao;
+    private DatabaseUtils databaseUtils;
 
     @Override
     public Optional<Survey> getSurveyById( Integer id,
                                            DeserializeSurveyOptions... surveyOptions ) throws InterruptedException{
         try{
-            dao.beginTransaction();
-            Optional<Survey> survey = dao.findSurvey( id, surveyOptions );
-            dao.endTransaction();
+            databaseUtils.beginTransaction();
+            Optional<Survey> survey = databaseUtils.findSurvey( id, surveyOptions );
+            databaseUtils.endTransaction();
             return survey;
         }catch( IOException e ){
             e.printStackTrace();
@@ -39,9 +42,9 @@ public class SurveyServiceImpl implements SurveyService{
     @Override
     public Optional<Integer> saveSurvey( Survey survey ) throws InterruptedException{
         try{
-            dao.beginTransaction();
-            Integer id = dao.saveNewSurvey( survey );
-            dao.endTransaction();
+            databaseUtils.beginTransaction();
+            Integer id = databaseUtils.saveNewSurvey( survey );
+            databaseUtils.endTransaction();
             return Optional.of( id );
         }catch( IOException e ){
             e.printStackTrace();
@@ -52,9 +55,9 @@ public class SurveyServiceImpl implements SurveyService{
     @Override
     public void deleteSurvey( Integer id ) throws InterruptedException{
         try{
-            dao.beginTransaction();
-            dao.deleteSurvey( id );
-            dao.endTransaction();
+            databaseUtils.beginTransaction();
+            databaseUtils.deleteSurvey( id );
+            databaseUtils.endTransaction();
         }catch( IOException e ){
             e.printStackTrace();
         }
@@ -62,19 +65,19 @@ public class SurveyServiceImpl implements SurveyService{
 
     @Override
     public Optional<User> getMadeUser( Integer id ) throws InterruptedException{
-        dao.beginTransaction();
+        databaseUtils.beginTransaction();
         Optional<User> user = Optional.of( getSurveyById( id, DeserializeSurveyOptions.CREATOR ).orElseThrow(
                 () -> new SurveyNotFoundException( id ) ).getCreator() );
-        dao.endTransaction();
+        databaseUtils.endTransaction();
         return user;
     }
 
     @Override
     public List<Survey> getTop( String sortBy, Integer limit, DeserializeSurveyOptions... options ){
         try{
-            dao.beginTransaction();
-            List<Survey> surveys = dao.listAllSurveys( SurveysSort.valueOf( sortBy.toUpperCase() ) , limit , options );
-            dao.endTransaction();
+            databaseUtils.beginTransaction();
+            List<Survey> surveys = databaseUtils.listAllSurveys( SurveysSort.valueOf( sortBy.toUpperCase() ) , limit , options );
+            databaseUtils.endTransaction();
             return surveys;
         }catch( IOException | InterruptedException e ){
             e.printStackTrace();
@@ -86,9 +89,9 @@ public class SurveyServiceImpl implements SurveyService{
     public Optional<Category> getCategoryByName( String name, Boolean downloadSurveys, SurveysSort surveysSort,
                                                  Integer limit ) throws InterruptedException{
         try{
-            dao.beginTransaction();
-            Optional<Category> category = dao.findCategory( name, downloadSurveys, surveysSort , limit );
-            dao.endTransaction();
+            databaseUtils.beginTransaction();
+            Optional<Category> category = databaseUtils.findCategory( name, downloadSurveys, surveysSort , limit );
+            databaseUtils.endTransaction();
             return category;
         }catch( IOException e ){
             e.printStackTrace();
@@ -100,9 +103,9 @@ public class SurveyServiceImpl implements SurveyService{
     public List<Category> getCategories( Boolean downloadSurveys, SurveysSort surveysSort, Integer limit )
             throws InterruptedException{
         try{
-            dao.beginTransaction();
-            List<Category> categories = dao.listAllCategories( downloadSurveys, surveysSort, limit );
-            dao.endTransaction();
+            databaseUtils.beginTransaction();
+            List<Category> categories = databaseUtils.listAllCategories( downloadSurveys, surveysSort, limit );
+            databaseUtils.endTransaction();
             return categories;
         }catch( IOException e ){
             e.printStackTrace();

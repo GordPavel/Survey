@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import ru.ssau.DAO.DAO;
+import ru.ssau.DAO.DatabaseUtils;
 import ru.ssau.DAO.enums.DeserializeSurveyOptions;
 import ru.ssau.domain.Survey;
 import ru.ssau.domain.User;
@@ -12,7 +12,6 @@ import ru.ssau.domain.UserAnswer;
 import ru.ssau.service.SurveyService;
 import ru.ssau.service.UserService;
 
-import java.nio.file.Files;
 import java.util.Optional;
 
 @Component
@@ -23,7 +22,7 @@ public class NewUserAnswerValidator implements Validator{
     @Autowired
     private SurveyService surveyService;
     @Autowired
-    private DAO dao;
+    private DatabaseUtils databaseUtils;
 
 
     @Override
@@ -61,7 +60,7 @@ public class NewUserAnswerValidator implements Validator{
         Optional<Survey> survey = surveyService.getSurveyById( userAnswer.getSurvey().getId() , DeserializeSurveyOptions.QUESTIONS );
         if( ! survey.isPresent() )
             return 2;
-        if( dao.isUserAnswerAlreadyExists( userAnswer ) )
+        if( databaseUtils.isUserAnswerAlreadyExists( userAnswer ) )
             return 4;
         if( survey.get().getQuestions().size() != userAnswer.getAnswers().size() )
             return 3;

@@ -24,21 +24,41 @@ import java.util.concurrent.Semaphore;
 @ComponentScan( "ru.ssau" )
 public class WebAppConfig extends WebMvcConfigurerAdapter{
 
+    /***
+     *
+     * @param registry registry resources files
+     */
     @Override
     public void addResourceHandlers( ResourceHandlerRegistry registry ){
         registry.addResourceHandler( "/pages/**" ).addResourceLocations( "/pages/" );
     }
 
+    /***
+     *
+     * @return JSON objects mapper
+     */
     @Bean
     public ObjectMapper objectMapper(){
         return new ObjectMapper();
     }
 
+
+    /***
+     *
+     * @return My implementation of UserDetailsService
+     * @see UserDetailsService
+     *
+     */
     @Bean
     public UserDetailsService getUserDetailsService(){
         return new UserDetailsServiceImpl();
     }
 
+
+    /***
+     *
+     * @return jsp's resolver
+     */
     @Bean
     public InternalResourceViewResolver setupViewResolver(){
         InternalResourceViewResolver resolver = new InternalResourceViewResolver();
@@ -49,6 +69,12 @@ public class WebAppConfig extends WebMvcConfigurerAdapter{
         return resolver;
     }
 
+
+    /***
+     *
+     * @return MultipartFile resolver for downloading and uploading pics
+     * @see org.springframework.web.multipart.MultipartFile
+     */
     @Bean
     CommonsMultipartResolver multipartResolver(){
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
@@ -67,6 +93,10 @@ public class WebAppConfig extends WebMvcConfigurerAdapter{
 
     private Semaphore semaphore = new Semaphore( 50, true );
 
+    /***
+     *
+     * @return semaphore for protecting database of too many connections
+     */
     @Bean
     public Semaphore semaphore(){
         return semaphore;

@@ -26,19 +26,29 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/***
+ * My own mind on databases ( just because I'm little dumb to connect normal MySQL database to server )
+ * All entities converts to JSON in storage
+ */
 @Repository
-public class DAO{
+public class DatabaseUtils{
     private final Semaphore    semaphore;
     private final Environment  environment;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public DAO( Semaphore semaphore, Environment environment, ObjectMapper objectMapper){
+    public DatabaseUtils( Semaphore semaphore, Environment environment, ObjectMapper objectMapper){
         this.semaphore = semaphore;
         this.environment = environment;
         this.objectMapper = objectMapper;
     }
 
+    /**
+     *
+     * Need to control of running connections with database
+     *
+     * @throws InterruptedException if too many connections
+     */
     public void beginTransaction() throws InterruptedException{
         semaphore.acquire();
     }
@@ -47,6 +57,18 @@ public class DAO{
         semaphore.release();
     }
 
+    /***
+     *
+     * @param predicate to filter all paths for paths that we need
+     * @param surveysSort type of surveys sorting
+     * @param limit max surveys that we need
+     *
+     * Options of surveys loading
+     *
+     * @return stream of
+     *              @see Survey
+     * @throws IOException because of request to files
+     */
     private Stream<Survey> listAllSurveys( Predicate<Path> predicate , SurveysSort surveysSort , Integer limit , Boolean downloadQuestions, Boolean downloadCreator, Boolean downloadUsers,
                                            Boolean downloadStatistics, Boolean downloadCategory ) throws IOException{
         Comparator<Survey> surveyComparator;
@@ -63,6 +85,16 @@ public class DAO{
                 .sorted( surveyComparator );
     }
 
+    /**
+     *
+     * @param surveysSort type of surveys sorting
+     * @param limit max surveys that we need
+     * @param options of load surveys
+     *                @see DeserializeSurveyOptions
+     * @return List of
+     *              @see Survey
+     * @throws IOException because of request to files
+     */
     public List<Survey> listAllSurveys( SurveysSort surveysSort , Integer limit , DeserializeSurveyOptions... options ) throws IOException{
         List<DeserializeSurveyOptions> surveyOptions = new ArrayList<>( Arrays.asList( options ) );
         if( surveysSort == SurveysSort.USERS )
@@ -72,6 +104,15 @@ public class DAO{
                 .collect( Collectors.toList());
     }
 
+    /**
+     *
+     * @param id to find survey
+     * @param options of load surveys
+     *                @see DeserializeSurveyOptions
+     * @return optional of
+     *              @see Survey that contains it if we found survey and empty options otherwise
+     * @throws IOException because of request to files
+     */
     public Optional<Survey> findSurvey( Integer id , DeserializeSurveyOptions... options ) throws IOException{
         List<DeserializeSurveyOptions> surveyOptions = Arrays.asList( options );
         Boolean downloadQuestions = surveyOptions.contains( DeserializeSurveyOptions.QUESTIONS ),
@@ -85,6 +126,15 @@ public class DAO{
         } , SurveysSort.TIME , 1 , downloadQuestions , downloadCreator , downloadUsers , downloadStatistics , downloadCategory ).findFirst();
     }
 
+    /***
+     *
+     * We have to find the lat index of all surveys in database and give to this one last + 1
+     * then check creator and category and if category is new - save it, then save all questions and answers
+     *
+     * @param survey that we want to save
+     * @return index of new survey
+     * @throws IOException because of request to files
+     */
     public Integer saveNewSurvey( Survey survey ) throws IOException{
         Integer id = Files.list( getSurveyDirectory() )
                 .filter( path -> ! path.toString().substring( getSurveyDirectoryNameLength() ).startsWith( "." ) )
@@ -140,11 +190,20 @@ public class DAO{
                         throw new SerializationException( path );
                     }
                 } );
-        if( isCategoryNew( survey.getCategory() ) )
+        if( Files.list( getCategoriesDirectory() )
+                .filter( path -> ! path.toString().substring( getCategoriesDirectoryNameLength() ).startsWith( "." ) )
+                .noneMatch( path ->  path.toString().substring( getCategoriesDirectoryNameLength() ).equals( survey.getCategory().getName() ) ) )
             saveCategory( survey.getCategory() );
         return id;
     }
 
+    /***
+     *
+     * We have to find file of this survey , all it's questions , answers and user answers and delete all of them
+     *
+     * @param id of survey that we want to delete
+     * @throws IOException because of request to files
+     */
     public void deleteSurvey( Integer id ) throws IOException{
         Files.delete( Files.list( getSurveyDirectory() )
                               .filter(
@@ -198,7 +257,16 @@ public class DAO{
     }
 
 
-
+    /**
+     *
+     * @param predicate to filter all paths for paths that we need
+     * @param downloadSurveys if you want to download all category's surveys
+     * @param surveysSort type of surveys sorting
+     * @param limit max items of surveys that we need
+     * @return stream of
+     *              @see Category
+     * @throws IOException because of request to files
+     */
     private Stream<Category> listAllCategories( Predicate<Path> predicate , Boolean downloadSurveys , SurveysSort surveysSort , Integer limit )
             throws IOException{
         Comparator<Category> comparator = Comparator.comparing( Category::getName );
@@ -218,15 +286,39 @@ public class DAO{
                 .sorted( comparator );
     }
 
+    /**
+     *
+     * @param downloadSurveys if you want to download all category's surveys
+     * @param surveysSort type of surveys sorting
+     * @param limit max items of surveys that we need
+     * @return list of
+     *              @see Category
+     * @throws IOException because of request to files
+     */
     public List<Category> listAllCategories( Boolean downloadSurveys , SurveysSort surveysSort , Integer limit )
             throws IOException{
         return listAllCategories( path -> true , downloadSurveys , surveysSort , limit ).collect( Collectors.toList());
     }
 
+    /**
+     *
+     * @param name of category that we need to find
+     * @param downloadSurveys if you want to download all category's surveys
+     * @param surveysSort type of surveys sorting
+     * @param limit max items of surveys that we need
+     * @return optional of
+     *              @see Category that contains it if we found survey and empty options otherwise
+     * @throws IOException because of request to files
+     */
     public Optional<Category> findCategory( String name , Boolean downloadSurveys , SurveysSort surveysSort , Integer limit  ) throws IOException{
         return listAllCategories( path ->  path.toString().substring( getCategoriesDirectoryNameLength() ).equals( name ), downloadSurveys , surveysSort , limit ).findFirst();
     }
 
+    /**
+     * Just crate new file of
+     *          @see Category
+     * @param category to save in database
+     */
     private void saveCategory( Category category ){
         Path path = Paths.get( getCategoriesDirectory() + "/" + category.getName() );
         try{
@@ -238,29 +330,71 @@ public class DAO{
     }
 
 
-
-    private Stream<User> listAllUsers( Predicate<Path> predicate , DeserializeUserOptions...options ) throws IOException{
-        List<DeserializeUserOptions> userOptions = Arrays.asList( options );
-        Boolean downloadMadeSurveys = userOptions.contains( DeserializeUserOptions.MADESURVEYS ),
-                downloadDoneSurveys = userOptions.contains( DeserializeUserOptions.ANSWERS );
+    /**
+     *
+     * @param predicate to filter all paths for paths that we need
+     *
+     * Options of surveys loading
+     *
+     * @return stream of
+     *              @see User
+     * @throws IOException because of request to files
+     */
+    private Stream<User> listAllUsers( Predicate<Path> predicate , Boolean downloadMadeSurveys , Boolean downloadDoneSurveys  ) throws IOException{
         return Files.list( getUserDirectory() )
                 .filter( path -> ! path.toString().substring( getUserDirectoryNameLength() ).startsWith( "." ) )
                 .filter( predicate )
                 .map( mapPathToUser( downloadMadeSurveys , downloadDoneSurveys ) );
     }
 
+    /**
+     *
+     * @param options of user loading
+     *                @see DeserializeUserOptions
+     * @return List of
+     *          @see User
+     * @throws IOException because of request to files
+     */
     public List<User> listAllUsers( DeserializeUserOptions... options ) throws IOException{
-        return listAllUsers( path -> true, options ).collect( Collectors.toList() );
+        List<DeserializeUserOptions> userOptions = Arrays.asList( options );
+        Boolean downloadMadeSurveys = userOptions.contains( DeserializeUserOptions.MADESURVEYS ),
+                downloadDoneSurveys = userOptions.contains( DeserializeUserOptions.ANSWERS );
+        return listAllUsers( path -> true, downloadMadeSurveys , downloadDoneSurveys ).collect( Collectors.toList() );
     }
 
+    /**
+     *
+     * @param login of user that we want to find
+     * @param options of user loading
+     *                @see DeserializeUserOptions
+     * @return optional of
+     *              @see User that contains it if we found survey and empty options otherwise
+     * @throws IOException because of request to files
+     */
     public Optional<User> findUser( String login , DeserializeUserOptions...options ) throws IOException{
-        return listAllUsers( path -> path.toString().substring( getUserDirectoryNameLength() ).equals( login ) , options ).findFirst();
+        List<DeserializeUserOptions> userOptions = Arrays.asList( options );
+        Boolean downloadMadeSurveys = userOptions.contains( DeserializeUserOptions.MADESURVEYS ),
+                downloadDoneSurveys = userOptions.contains( DeserializeUserOptions.ANSWERS );
+        return listAllUsers( path -> path.toString().substring( getUserDirectoryNameLength() ).equals( login ) , downloadMadeSurveys ,
+                             downloadDoneSurveys ).findFirst();
     }
 
+    /**
+     *
+     *  Just save ine file of user's data
+     *
+     * @param user to save in database
+     * @throws IOException because of request to files
+     */
     public void saveUser( User user ) throws IOException{
         saveBDUser( new BDUser( user ) );
     }
 
+    /**
+     *
+     * @param login of user that we want to change parameter
+     * @param consumer choose of parameter to change
+     */
     public void updateUser( String login, Consumer<BDUser> consumer ){
         try{
             BDUser bdUser = Files.list( getUserDirectory() )
@@ -277,6 +411,13 @@ public class DAO{
         }
     }
 
+    /**
+     *
+     * We have to find all his surveys and answers on surveys and delete them
+     *
+     * @param login of user that we want to delete
+     * @throws IOException because of request to files
+     */
     public void deleteUser( String login ) throws IOException{
         deleteBDUser( login );
         listAllSurveys( path -> {
@@ -319,6 +460,15 @@ public class DAO{
                 } );
     }
 
+
+    /**
+     *
+     * @param predicate to filter all paths for paths that we need
+     * @param downloadStatistics if you want to see all statistics of answer
+     * @return stream of
+     *              @see UserAnswer
+     * @throws IOException because of request to files
+     */
     private Stream<UserAnswer> getUserAnswers( Predicate<Path> predicate , Boolean downloadStatistics ) throws IOException{
         return Files.list( getUserAnswerDirectory() )
                 .filter( path -> ! path.toString().substring( getUserAnswerDirectoryNameLength() ).startsWith( "." ) )
@@ -326,28 +476,31 @@ public class DAO{
                 .map( mapPathToUserAnswer( downloadStatistics ) );
     }
 
-    public List<UserAnswer> listAllUserAnswersByLogin( String login , Boolean downloadStatistics ) throws IOException{
-        return getUserAnswers( path -> {
-            String str = path.toString().substring( getUserAnswerDirectoryNameLength() );
-            return str.substring( 0 , str.indexOf( "_" ) ).equals( login );
-        } , downloadStatistics ).collect( Collectors.toList() );
-    }
-
-    public List<UserAnswer> listAllUserAnswersById( Integer id , Boolean downloadStatistics ) throws IOException{
-        return getUserAnswers( path -> {
-            String str = path.toString().substring( getUserAnswerDirectoryNameLength() );
-            return str.substring( str.indexOf( "_" ) + 1 ).equals( id.toString() );
-        } , downloadStatistics ).collect( Collectors.toList() );
-    }
-
+    /**
+     *
+     *  Check about database contains this user and survey
+     *
+     * @param userAnswer to save in database
+     * @throws IOException because of request to files
+     */
     public void saveNewUserAnswer( UserAnswer userAnswer ) throws IOException{
         Files.write( Paths.get( getUserAnswerDirectory() + "/" + userAnswer.getUser().getLogin() + "_" + userAnswer.getSurvey().getId() ) ,
                      objectMapper.writeValueAsString( userAnswer.getAnswers() ).getBytes( Charset.forName( "utf-8" ) ) ,
                      StandardOpenOption.CREATE_NEW , StandardOpenOption.WRITE );
     }
 
+    /**
+     *
+     * Just delete one file login_id
+     *
+     * @param id of survey to check
+     * @param login of user to check
+     * @throws IOException because of request to files
+     */
     public void deleteUserAnswer( Integer id , String login ) throws IOException{
-        Files.list( getUserAnswerDirectory() )
+        if( isUserAnswerAlreadyExists( new UserAnswer( findSurvey( id ).orElseThrow( () -> new SurveyNotFoundException( id ) ) ,
+                                                       findUser( login ).orElseThrow( () -> new UserNotFoundException( login ) ) ) ) )
+            Files.list( getUserAnswerDirectory() )
                 .filter( path -> ! path.toString().substring( getUserAnswerDirectoryNameLength() ).startsWith( "." ) )
                 .filter( path -> path.toString().substring( getUserAnswerDirectoryNameLength() ).equals( login + "_" + id ) )
                 .forEach( path -> {
@@ -358,8 +511,15 @@ public class DAO{
                         throw new DeserializationException( path );
                     }
                 } );
+        else
+            throw new IllegalArgumentException( "Can't find user or survey" );
     }
 
+    /**
+     *
+     * @param userAnswer ti check it in database
+     * @return exists or not
+     */
     public Boolean isUserAnswerAlreadyExists( UserAnswer userAnswer ){
         try{
             return Files.list( getUserAnswerDirectory() )
@@ -371,16 +531,13 @@ public class DAO{
         }
     }
 
-    private Boolean isCategoryNew( Category category ){
-        try{
-            return Files.list( getCategoriesDirectory() )
-                    .filter( path -> ! path.toString().substring( getCategoriesDirectoryNameLength() ).startsWith( "." ) )
-                    .noneMatch( path ->  path.toString().substring( getCategoriesDirectoryNameLength() ).equals( category.getName() ) );
-        }catch( IOException e ){
-            e.printStackTrace();
-            return false;
-        }
-    }
+
+    /***
+     *
+     * Functions that map any path to any entity with different load options
+     *
+     * @return any entity that you want
+     */
 
     private Function<Path,Survey> mapPathToSurvey( Boolean downloadQuestions, Boolean downloadCreator, Boolean downloadUsers,
                                                    Boolean downloadStatistics, Boolean downloadCategory ){
@@ -390,7 +547,10 @@ public class DAO{
                 if( downloadCreator )
                     bdSurvey.setUserCreator( findUser( bdSurvey.getCreator() ).orElseThrow( () -> new UserNotFoundException( bdSurvey.getCreator() ) ) );
                 if( downloadUsers )
-                    bdSurvey.setAnswers( listAllUserAnswersById( bdSurvey.getId() , downloadStatistics ) );
+                    bdSurvey.setAnswers( getUserAnswers( path1 -> {
+                        String str = path1.toString().substring( getUserAnswerDirectoryNameLength() );
+                        return str.substring( str.indexOf( "_" ) + 1 ).equals( bdSurvey.getId().toString() );
+                    } , downloadStatistics ).collect( Collectors.toList() ) );
                 if( downloadQuestions ){
                     bdSurvey.setQuestions( Files.list( getQuestionsDirectory() )
                                                    .filter( path1 -> ! path1.toString().substring( getSurveyDirectoryNameLength() ).startsWith( "." ) )
@@ -509,7 +669,10 @@ public class DAO{
                 throw new DeserializationException( path );
             }
             if( downloadDoneSurveys ) try{
-                bdUser.setAnswers( listAllUserAnswersByLogin( bdUser.getLogin(), false ) );
+                bdUser.setAnswers( getUserAnswers( path1 -> {
+                    String str = path1.toString().substring( getUserAnswerDirectoryNameLength() );
+                    return str.substring( 0 , str.indexOf( "_" ) ).equals( bdUser.getLogin() );
+                } , false ).collect( Collectors.toList() ) );
             }catch( IOException e ){
                 e.printStackTrace();
                 throw new DeserializationException( path );
@@ -529,6 +692,7 @@ public class DAO{
     }
 
 
+
     private void deleteBDUser( String login ) throws IOException{
         Files.delete( Files.list( getUserDirectory() )
                 .filter( path -> ! path.toString().substring( getUserDirectoryNameLength() ).startsWith( "." ) )
@@ -540,6 +704,13 @@ public class DAO{
         Path path = Paths.get( getUserDirectory() + "/" + bdUser.getLogin() );
         Files.write( path , objectMapper.writeValueAsString( bdUser ).getBytes( Charset.forName( "utf-8" ) ) , StandardOpenOption.CREATE_NEW );
     }
+
+    /***
+     *
+     * Functions to find directory of any entity and it's path length to substing all path to name of entity
+     *
+     * @return Path of directory or length of it's string
+     */
 
     private Path getSurveyDirectory(){
         return Paths.get( environment.getProperty( "storage" ) + environment.getProperty( "surveyStorage" ) );

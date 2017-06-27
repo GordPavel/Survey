@@ -2,6 +2,9 @@ package ru.ssau.controller;
 
 import org.springframework.web.multipart.MultipartFile;
 
+/***
+ * Just container for user data on registration
+ */
 public class UserRegistrationForm{
     private String        login;
     private String        password;

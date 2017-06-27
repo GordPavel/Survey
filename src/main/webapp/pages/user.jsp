@@ -21,6 +21,8 @@
             <c:out value="${error}"/>
         </c:if>
         <p><strong>Личный кабинет</strong></p>
+        <sec:authentication  property="principal.username" var="login"  scope="request"/>
+        <a href="<c:url value="/deleteUser?login=${login}"/>">Удалить профиль</a>
     </div>
     <table cellspacing="0" border="2">
         <tr>

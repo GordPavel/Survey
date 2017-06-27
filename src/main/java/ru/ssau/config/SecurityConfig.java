@@ -19,11 +19,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+    /***
+     *
+     * @param auth registrates user service adapter to spring authentications
+     * @throws Exception don't know, why
+     */
+
     @Autowired
     public void registerGlobalAuthentication( AuthenticationManagerBuilder auth ) throws Exception{
         auth.userDetailsService( userDetailsService ).passwordEncoder( getShaPasswordEncoder() );
     }
 
+    /***
+     *
+     * @param http configure protected pages
+     * @throws Exception don't know, why
+     */
     @Override
     protected void configure( HttpSecurity http ) throws Exception{
         http
@@ -52,6 +63,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                 true );
     }
 
+    /***
+     *
+     * @return password encoder for user passw
+     */
     @Bean
     public ShaPasswordEncoder getShaPasswordEncoder(){
         return new ShaPasswordEncoder( 256 );

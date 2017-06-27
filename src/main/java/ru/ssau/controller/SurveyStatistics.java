@@ -9,6 +9,9 @@ import ru.ssau.exceptions.UserAnswerNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/***
+ * Jusr container to show survey statistics
+ */
 public class SurveyStatistics{
     private Integer         id;
     private String          name;
