@@ -1,0 +1,9 @@
+ru.ssau.DAO
+ru.ssau.DAO.enums
+ru.ssau.config
+ru.ssau.controller
+ru.ssau.domain
+ru.ssau.exceptions
+ru.ssau.service
+ru.ssau.service.filesmanager
+ru.ssau.service.validation
