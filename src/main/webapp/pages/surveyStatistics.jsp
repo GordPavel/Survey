@@ -20,7 +20,7 @@
 <c:import url="header.jsp"/>
 <div class = "content-bg">
     <div class="article">
-        <p><strong> Анкета ${survey.id} ${survey.name}</strong></p> </div>
+        <p><strong> Анкета ${survey.name}</strong></p> </div>
     <li><a href="<c:url value="/topic?name=${survey.category.name}"/>">Категория ${survey.category.name}</a></li>
     <li><a href="<c:url value="/user?login=${survey.creator.login}"/>">Создатель ${survey.creator.login}</a></li>
     <div class="main">
